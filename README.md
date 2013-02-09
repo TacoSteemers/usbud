@@ -2,12 +2,10 @@ usbud
 =====
 
 USB Storage Back Up Deamon
-
 The deamon will back up usb storage devices when they are plugged in.
-
 usbud depends on the df program.
-
 usbud is a work in progress, and not yet functional.
+Log output can be found in syslog.
 
 ## To be implemented:
 - Keeping state past each detection run
