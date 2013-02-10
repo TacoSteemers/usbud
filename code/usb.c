@@ -150,55 +150,14 @@ int checkIfItemMounted(char *item){
 	while(!feof(file)) {
 		if (fgets(outputBuffer,sizeof(outputBuffer),file)) {
 		    // Check if this line starts with our item
-			if(strncmp(outputBuffer, newItemId, strlen(newItemId)) == 0)
+			if(strncmp(outputBuffer, newItemId, strlen(newItemId)) != 0)
 			{
-				// It does
-				syslog(LOG_NOTICE, "%s has been mounted, according to df output: %s", item, outputBuffer);
-				return 1;
+				continue;
 			}
+			// It does
+			syslog(LOG_NOTICE, "%s has been mounted, according to /proc/mounts: %s", item, outputBuffer);
+			return 1;
 		}
 	}
-	return 0;
-}
-
-int checkIfItemMountedViaDf(char *item){
-	char newItemId[32];
-	char outputText[1024];
-	char outputBuffer[1024];
-
-	sprintf(newItemId, "/dev/%s", item);
-	//syslog(LOG_NOTICE, "strlen(newItemId): %lu newItemId: %s", strlen(newItemId), newItemId);
-	FILE *outputPipe = popen ("df", "r");
-	if (!outputPipe)
-	{
-		syslog(LOG_ERR, "Could not open df");
-		return EXIT_FAILURE;
-	}
-
-	while(!feof(outputPipe)) {
-    	if(fgets(outputBuffer, sizeof(outputBuffer), outputPipe) != NULL)
-    	{
-			strcat(outputText, (const char*) outputBuffer);
-			strcat(outputText, "\n");
-
-			// Check if this line starts with our item
-			if(strncmp(outputBuffer, newItemId, strlen(newItemId)) == 0)
-			{
-				// It does
-				syslog(LOG_NOTICE, "%s has been mounted, according to df output: \"%s\"<snip>", item, outputBuffer);
-				return 1;
-			}
-		} 
-    }
-
-	//syslog(LOG_NOTICE, "df results: %s", outputText);
-	outputText[0] = 0;
-	outputBuffer[0] = 0;
-
-	if (pclose (outputPipe) != 0)
-	{
-		syslog(LOG_ERR, "Could not close df");
-	}
-
 	return 0;
 }
