@@ -11,7 +11,7 @@
 #include <fcntl.h> // File control options (contains open())
 #include "usb.h"
 
-void doCheck() {
+void doCheck(void) {
     DIR *dirp;
     struct dirent *dp;
     char dir_to_check[256];
