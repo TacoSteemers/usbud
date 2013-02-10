@@ -14,10 +14,10 @@
 #include <unistd.h>
 #include <syslog.h>
 #include <string.h>
+#include "processArguments.h"
 #include "usb.h"
 
-int main(void) {
-        
+int main(int argc, char *argv[]) {
     /* Our process ID and Session ID */
     pid_t pid, sid;
     
@@ -59,9 +59,9 @@ int main(void) {
     close(STDOUT_FILENO);
     close(STDERR_FILENO);
     
-    /* Daemon-specific initialization goes here 
-	   Load configuration file here? */
-    
+    /* Initialization of the daemon functionality */
+   	processArguments(argv, argc);
+
     /* The Big Loop */
     while (1) {
 	   doCheck();
