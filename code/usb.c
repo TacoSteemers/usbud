@@ -10,6 +10,8 @@
 #include <syslog.h>
 #include <fcntl.h> // File control options (contains open())
 #include "usb.h"
+#include "devices.h"
+#include "global.h"
 
 void doCheck(void) {
     DIR *dirp;
@@ -144,7 +146,7 @@ int checkIfItemMounted(char *item){
 	if (!file)
 	{
 		syslog(LOG_ERR, "Could not open /proc/mounts");
-		return EXIT_FAILURE;
+		exit(EXIT_FAILURE);
 	}
 
 	while(!feof(file)) {
