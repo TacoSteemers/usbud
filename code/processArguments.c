@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <syslog.h>
 #include <string.h>
+#include "devices.h"
 #include "global.h"
 #include "processArguments.h"
 

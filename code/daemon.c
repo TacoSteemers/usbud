@@ -16,6 +16,8 @@
 #include <string.h>
 #include "processArguments.h"
 #include "usb.h"
+#include "devices.h"
+#include "global.h"
 
 int main(int argc, char *argv[]) {
     /* Our process ID and Session ID */
@@ -60,6 +62,7 @@ int main(int argc, char *argv[]) {
     close(STDERR_FILENO);
     
     /* Initialization of the daemon functionality */
+	initializeDeviceBookKeeping();
    	processArguments(argv, argc);
 
     /* The Big Loop */

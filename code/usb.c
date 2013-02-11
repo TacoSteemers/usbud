@@ -32,28 +32,28 @@ void doCheck(void) {
     } while (dp != NULL);
 }
 
-void processItem(char *str) {
+void processItem(char *strInputPath) {
 	//syslog(LOG_DEBUG, "looking at %s\n", str); 
 
     ssize_t len; // Length of the path to the symbolic link
     int i;
     char buf[256], *p;
-    char device[256];
-    char location[256];
-	char id[1024];
+    char strDevice[256];
+    char strLocation[256];
+	char strId[1024];
 
 	// Construct the path to /sys/block/...
-	snprintf(location, sizeof location, "/sys/block/%s", str);
+	snprintf(strLocation, sizeof strLocation, "/sys/block/%s", strInputPath);
     
 	// Read symbolink link 'location' into buf, 
 	// returns the number of bytes it has placed in buf
-    len = readlink(location, buf, 256);
+    len = readlink(strLocation, buf, 256);
     buf[len] = 0;
 
 	// Format a string, into device
 	// device will contain the path to the actual device, 
 	// rather than the symbolic link
-    sprintf(device, "%s/%s", "/sys/block/", buf);
+    sprintf(strDevice, "%s/%s", "/sys/block/", buf);
 
 	// strrchr: Locate last occurrence of character in string
 	//          Returns a pointer to the last occurrence of 
@@ -62,16 +62,22 @@ void processItem(char *str) {
 	// '/' character
 	// We do this to get the proper device location
     for (i=0; i<6; i++) {
-        p = strrchr(device, '/');
+        p = strrchr(strDevice, '/');
         *p = 0;
     }
 	
 	// Now we try to create a device id
 	int intIdLen = 0;
-	getDeviceInfo(id, &intIdLen, device);
+	getDeviceInfo(strId, &intIdLen, strDevice);
 	if(intIdLen==0)
 		return;
-	checkIfItemMounted(str);
+	if(checkIfItemMounted(strInputPath)==0)
+		return; /* Not mounted, not of interest */
+	device newDevice;
+	newDevice.id = strId;
+	if(checkIfDeviceIsKnown(newDevice)==1)
+		return; /* Already known, not of interest */
+	registerDevice(newDevice);
 }
 
 void getDeviceInfo(char* out, int *pOutLen, const char device[]){
