@@ -16,36 +16,26 @@
 void doCheck(void) {
     DIR *dirp;
     struct dirent *dp;
-    char dir_to_check[256];
-
-    snprintf(dir_to_check, sizeof dir_to_check, "/sys/block/");
-	if ((dirp = opendir("/sys/block/")) == NULL) 
+    char* dir_to_check = "/sys/block/";
+	if ((dirp = opendir(dir_to_check)) == NULL) 
     {
-		syslog(LOG_ERR, "couldn't open '/sys/block/'");  
+		syslog(LOG_ERR, "couldn't open '%s'",  dir_to_check);  
         return;
     }
-
-
-	// Proccess each item in /sys/block
     do 
-    {
-        if ((dp = readdir(dirp)) != NULL) 
-        {
-            char location[256];
-            snprintf(location, sizeof location, "%s%s", dir_to_check, dp->d_name);
-
-			if(dp->d_name[0]=='s' && dp->d_name[1]=='d')
-            {
-                processItem(dp->d_name);
-            }
-        }
+    {	// Proccess each item in /sys/block
+        if ((dp = readdir(dirp)) == NULL) 
+        	continue;
+		if(dp->d_name[0]!='s' || dp->d_name[1]!='d')
+        	continue;
+        processItem(dp->d_name);
     } while (dp != NULL);
 }
 
 void processItem(char *str) {
 	//syslog(LOG_DEBUG, "looking at %s\n", str); 
 
-    ssize_t len; // Length of the ppath to the symbolic link
+    ssize_t len; // Length of the path to the symbolic link
     int i;
     char buf[256], *p;
     char device[256];
@@ -59,14 +49,11 @@ void processItem(char *str) {
 	// returns the number of bytes it has placed in buf
     len = readlink(location, buf, 256);
     buf[len] = 0;
-	//syslog(LOG_DEBUG, "buf\t%s\n", buf); 
-	
 
 	// Format a string, into device
 	// device will contain the path to the actual device, 
 	// rather than the symbolic link
     sprintf(device, "%s/%s", "/sys/block/", buf);
-	//syslog(LOG_DEBUG, "device first\t%s\n", device); 
 
 	// strrchr: Locate last occurrence of character in string
 	//          Returns a pointer to the last occurrence of 
@@ -78,17 +65,13 @@ void processItem(char *str) {
         p = strrchr(device, '/');
         *p = 0;
     }
-	//syslog(LOG_DEBUG, "device second\t%s\n", device); 
-
 	
 	// Now we try to create a device id
 	int intIdLen = 0;
 	getDeviceInfo(id, &intIdLen, device);
-	if(intIdLen!=0)
-	{
-		//syslog(LOG_INFO, "found %s in spot %s\n", id, location);
-		checkIfItemMounted(str) ;
-	}
+	if(intIdLen==0)
+		return;
+	checkIfItemMounted(str);
 }
 
 void getDeviceInfo(char* out, int *pOutLen, const char device[]){
@@ -107,10 +90,6 @@ void getDeviceInfo(char* out, int *pOutLen, const char device[]){
 	{
 		strcpy(out, "");
 	} 
-	else
-	{
-		//out[*pOutLen-1] = 0;
-	}
 }
 
 void addDeviceInfo(char *out, int *pOutLen, const char device[], const char property[]){
@@ -153,9 +132,7 @@ int checkIfItemMounted(char *item){
 		if (fgets(outputBuffer,sizeof(outputBuffer),file)) {
 		    // Check if this line starts with our item
 			if(strncmp(outputBuffer, newItemId, strlen(newItemId)) != 0)
-			{
 				continue;
-			}
 			// It does
 			syslog(LOG_NOTICE, "%s has been mounted, according to /proc/mounts: %s", item, outputBuffer);
 			return 1;
