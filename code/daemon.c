@@ -19,6 +19,8 @@
 #include "devices.h"
 #include "global.h"
 
+int gCurrentRunId; /* declared in global.c */
+
 int main(int argc, char *argv[]) {
     /* Our process ID and Session ID */
     pid_t pid, sid;
@@ -62,6 +64,7 @@ int main(int argc, char *argv[]) {
     close(STDERR_FILENO);
     
     /* Initialization of the daemon functionality */
+	gCurrentRunId = 0; /* declared in global.c */
 	initializeDeviceBookKeeping();
    	processArguments(argv, argc);
 

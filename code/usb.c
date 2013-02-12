@@ -17,6 +17,9 @@ void doCheck(void) {
     DIR *dirp;
     struct dirent *dp;
     char* dir_to_check = "/sys/block/";
+
+	initializeRun();
+
 	if ((dirp = opendir(dir_to_check)) == NULL) 
     {
 		syslog(LOG_ERR, "couldn't open '%s'",  dir_to_check);  
@@ -30,6 +33,8 @@ void doCheck(void) {
         	continue;
         processItem(dp->d_name);
     } while (dp != NULL);
+
+	finalizeRun();
 }
 
 void processItem(char *strInputPath) {
@@ -75,9 +80,7 @@ void processItem(char *strInputPath) {
 		return; /* Not mounted, not of interest */
 	device newDevice;
 	newDevice.id = strId;
-	if(checkIfDeviceIsKnown(newDevice)==1)
-		return; /* Already known, not of interest */
-	registerDevice(newDevice);
+	processDevice(newDevice);
 }
 
 void getDeviceInfo(char* out, int *pOutLen, const char device[]){
