@@ -15,8 +15,8 @@
 #include <syslog.h>
 #include <string.h>
 #include "processArguments.h"
-#include "usb.h"
-#include "devices.h"
+#include "detection.h"
+#include "bookKeeping.h"
 #include "global.h"
 
 int gCurrentRunId; /* declared in global.c */

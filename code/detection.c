@@ -9,8 +9,8 @@
 #include <stdlib.h> // Contains system(), among other
 #include <syslog.h>
 #include <fcntl.h> // File control options (contains open())
-#include "usb.h"
-#include "devices.h"
+#include "detection.h"
+#include "bookKeeping.h"
 #include "global.h"
 
 void doCheck(void) {

@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <syslog.h>
 #include <string.h>
-#include "devices.h"
+#include "bookKeeping.h"
 #include "global.h"
 
 void initializeDeviceBookKeeping(void)
