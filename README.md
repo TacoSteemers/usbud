@@ -8,7 +8,6 @@ Log output can be found in syslog.
 Project is known to work on GNU/Linux systems. usbud depends on the availability of items such as "/sys/block" and "/proc/mounts".
 
 ## To be implemented:
-- Keeping state past each detection run
 - The actual backing up
 - Configuration options for storage device size limits
 - Configuration options for target directory size limits
