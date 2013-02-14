@@ -4,20 +4,29 @@
 #include "bookKeeping.h"
 #include "global.h"
 
+device* gDevicesOnPreviousRun[MAXNUMDEVS];
+
 void initializeDeviceBookKeeping(void)
 {
 	int i = 0;
-	device* newDevice = malloc(sizeof(device));
-	memset(newDevice,0,sizeof(device));
-	newDevice->id = malloc(sizeof(char));
-	newDevice->id[0] = 0;
-	newDevice->runId = 0;
 	for(; i < MAXNUMDEVS; i++)
 	{
-		newDevice->index = i;
-		memcpy(&gDevicesOnPreviousRun[i], newDevice, sizeof(device));
+		gDevicesOnPreviousRun[i] = malloc(sizeof(device));
+		if(!gDevicesOnPreviousRun[i])
+		{
+			syslog(LOG_ERR, "Exiting with failure: malloc failed during initialization");
+			exit(EXIT_FAILURE);
+		}
+		gDevicesOnPreviousRun[i]->index = i;
+		gDevicesOnPreviousRun[i]->runId = 0;
+		gDevicesOnPreviousRun[i]->id = malloc(sizeof(char) * 256);
+		if(!gDevicesOnPreviousRun[i]->id)
+		{
+			syslog(LOG_ERR, "Exiting with failure: malloc failed during initialization");
+			exit(EXIT_FAILURE);
+		}
+		gDevicesOnPreviousRun[i]->id[0] = '\0';
 	}
-	free(newDevice);
 }
 
 void initializeRun(void)
@@ -39,6 +48,11 @@ void finalizeRun(void)
 	/* Here we will remove stale data from bookkeeping */
 	for(; i < MAXNUMDEVS; i++)
 	{
+		syslog(LOG_DEBUG, "Found device \"%s\" with runId %d, at index %d (%d).",
+			gDevicesOnPreviousRun[i]->id,
+			gDevicesOnPreviousRun[i]->runId,
+			gDevicesOnPreviousRun[i]->index, 
+			i);
 		if(gDevicesOnPreviousRun[i]->id[0] == 0)
 			continue; /* No data, no need to remove */
 		if(gDevicesOnPreviousRun[i]->runId == gCurrentRunId)
@@ -48,29 +62,27 @@ void finalizeRun(void)
 			gDevicesOnPreviousRun[i]->runId, 
 			gDevicesOnPreviousRun[i]->index, 
 			i);
-		gDevicesOnPreviousRun[i]->id[0] = 0;
+		gDevicesOnPreviousRun[i]->id[0] = '\0';
 		gDevicesOnPreviousRun[i]->runId = 0;
 		syslog(LOG_DEBUG, "Removed stale device.");
 	}
 }
 
-void processDevice(device d)
+void processDevice(char* deviceId)
 {
-	if(checkIfDeviceIsKnown(d)==1)
+	if(checkIfDeviceIsKnown(deviceId)==1)
 		return; /* Already known, and thus backed up */
-	registerDevice(d);
-	backDeviceUp(d);
+	registerDevice(deviceId);
+	backDeviceUp(deviceId);
 }
 
-int checkIfDeviceIsKnown(device d)
+int checkIfDeviceIsKnown(char* deviceId)
 {
-	syslog(LOG_DEBUG, "checkIfDeviceIsKnown \"%s\".", d.id);
+	syslog(LOG_DEBUG, "checkIfDeviceIsKnown \"%s\".", deviceId);
 	int i = 0;
 	for(; i < MAXNUMDEVS; i++)
 	{
-		if(gDevicesOnPreviousRun[i]->id[0] == 0)
-			continue; /* Empty spot */
-		if(gDevicesOnPreviousRun[i]->id!=d.id)
+		if(strncmp(gDevicesOnPreviousRun[i]->id, deviceId, strlen(deviceId)) != 0)
 			continue; /* Not the same */
 		gDevicesOnPreviousRun[i]->runId = gCurrentRunId;
 		syslog(LOG_DEBUG, "Device is already known (as \"%s\", at index %d (%d)). runId has been updated.", 
@@ -84,24 +96,27 @@ int checkIfDeviceIsKnown(device d)
 	return 0;
 }
 
-void registerDevice(device d)
+void registerDevice(char* deviceId)
 {
-	syslog(LOG_DEBUG, "registerDevice \"%s\".", d.id);
+	syslog(LOG_DEBUG, "registerDevice \"%s\".", deviceId);
 	int i = 0;
 	for(; i < MAXNUMDEVS; i++)
 	{
-		if(gDevicesOnPreviousRun[i]->id[0] != 0)
+		if(gDevicesOnPreviousRun[i]->id[0] != '\0')
 			continue; /* Not an empty spot */
-		d.runId = gCurrentRunId;
-		d.index = i;
-		memcpy(gDevicesOnPreviousRun[i], &d, sizeof(device));
-		syslog(LOG_DEBUG, "Device \"%s\" has been registered (as \"%s\").", d.id, gDevicesOnPreviousRun[i]->id);
+		memcpy(gDevicesOnPreviousRun[i]->id, deviceId, strlen(deviceId)+1);
+		gDevicesOnPreviousRun[i]->runId = gCurrentRunId;
+		syslog(LOG_DEBUG, "Device \"%s\" has been registered (as \"%s\", at index %d (%d)).", 
+			deviceId, 
+			gDevicesOnPreviousRun[i]->id,
+			gDevicesOnPreviousRun[i]->index, 
+			i);
 		return;
 	}
-	syslog(LOG_DEBUG, "Device \"%s\" could not be registered.", d.id);
+	syslog(LOG_DEBUG, "Device \"%s\" could not be registered.", deviceId);
 }
 
-void backDeviceUp(device d)
+void backDeviceUp(char* deviceId)
 {
-	syslog(LOG_DEBUG, "backDeviceUp \"%s\". Not yet implemented.", d.id);
+	syslog(LOG_DEBUG, "backDeviceUp \"%s\". Not yet implemented.", deviceId);
 }

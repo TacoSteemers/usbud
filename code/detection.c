@@ -45,7 +45,7 @@ void processItem(char *strInputPath) {
     char buf[256], *p;
     char strDevice[256];
     char strLocation[256];
-	char strId[1024];
+	char strId[256];
 
 	// Construct the path to /sys/block/...
 	snprintf(strLocation, sizeof strLocation, "/sys/block/%s", strInputPath);
@@ -78,9 +78,10 @@ void processItem(char *strInputPath) {
 		return;
 	if(checkIfItemMounted(strInputPath)==0)
 		return; /* Not mounted, not of interest */
-	device newDevice;
-	newDevice.id = strId;
-	processDevice(newDevice);
+	//device newDevice;
+	//newDevice.id = strId;
+	//processDevice(newDevice);
+	processDevice(strId);
 }
 
 void getDeviceInfo(char* out, int *pOutLen, const char device[]){
