@@ -38,21 +38,14 @@ void initializeRun(void)
 	{
 		gCurrentRunId = 1;
 	}
-	syslog(LOG_DEBUG, "initializeRun (leaving) gCurrentRunId is %d.", gCurrentRunId);
 }
 
 void finalizeRun(void)
 {
-	syslog(LOG_DEBUG, "finalizeRun, gCurrentRunId is %d.", gCurrentRunId);
 	int i = 0;
 	/* Here we will remove stale data from bookkeeping */
 	for(; i < MAXNUMDEVS; i++)
 	{
-		syslog(LOG_DEBUG, "Found device \"%s\" with runId %d, at index %d (%d).",
-			gDevicesOnPreviousRun[i]->id,
-			gDevicesOnPreviousRun[i]->runId,
-			gDevicesOnPreviousRun[i]->index, 
-			i);
 		if(gDevicesOnPreviousRun[i]->id[0] == 0)
 			continue; /* No data, no need to remove */
 		if(gDevicesOnPreviousRun[i]->runId == gCurrentRunId)
@@ -78,7 +71,6 @@ void processDevice(char* deviceId)
 
 int checkIfDeviceIsKnown(char* deviceId)
 {
-	syslog(LOG_DEBUG, "checkIfDeviceIsKnown \"%s\".", deviceId);
 	int i = 0;
 	for(; i < MAXNUMDEVS; i++)
 	{
@@ -91,14 +83,11 @@ int checkIfDeviceIsKnown(char* deviceId)
 			i);
 		return 1;
 	}
-
-	syslog(LOG_DEBUG, "Device is not known.");
 	return 0;
 }
 
 void registerDevice(char* deviceId)
 {
-	syslog(LOG_DEBUG, "registerDevice \"%s\".", deviceId);
 	int i = 0;
 	for(; i < MAXNUMDEVS; i++)
 	{
