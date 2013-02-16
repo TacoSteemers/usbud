@@ -3,6 +3,7 @@
 #include <string.h>
 #include "bookKeeping.h"
 #include "global.h"
+#include "util.h"
 
 device* devices[MAXNUMDEVS];
 
@@ -107,5 +108,33 @@ void registerDevice(char* deviceId)
 
 void backDeviceUp(char* deviceId)
 {
+	int blacklisted = 0;
+	int whitelisted = 0;
+	int needsWhitelisting = 0;
+	int backUp = 1;
+    if(gBlacklist != NULL)
+	{
+		blacklisted = contains(gBlacklist, deviceId);
+	}
+    if(gWhitelist != NULL)
+	{
+		needsWhitelisting = 1;
+		whitelisted = contains(gWhitelist, deviceId);
+	}
+	if((blacklisted == 1) && (whitelisted == 1))
+	{
+		syslog(LOG_INFO, "Device \"%s\" has been blacklisted as well as whitelisted. It will not be backed up.", deviceId);
+		return;
+	}
+	if(blacklisted == 1)
+	{
+		syslog(LOG_INFO, "Device \"%s\" has been blacklisted. It will not be backed up.", deviceId);
+		return;
+	}
+	if(needsWhitelisting && !whitelisted)
+	{
+		syslog(LOG_INFO, "Device \"%s\" has not been whitelisted. It will not be backed up.", deviceId);
+		return;
+	}
 	syslog(LOG_DEBUG, "backDeviceUp \"%s\". Not yet implemented.", deviceId);
 }

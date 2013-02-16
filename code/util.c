@@ -1,5 +1,6 @@
-#include <ctype.h> // isspace
-#include <string.h> // strlen
+#include <ctype.h>  /* isspace */
+#include <string.h> /* strlen */
+#include "global.h" /* MAXLISTLENGTH */
 
 /* Removes trailing spaces, blanks and control characters */
 void tidyStringUp(char * string)
@@ -12,4 +13,18 @@ void tidyStringUp(char * string)
 			break;
 		string[i] = '\0';
 	}
+}
+
+int contains(const char * const * list, const char* item)
+{
+	int i = 0;
+	for(; i < MAXLISTLENGTH; i++)
+	{
+		if(!list[i] || list[i][0] == '\0')
+			return 0; /* No match, reached end of list contents */
+		if( (strncmp(list[i], item, strlen(item)) == 0) && 
+			(strlen(list[i]) == strlen(item)))
+			return 1; /* This is a match */
+	}
+	return 0; /* No match */
 }

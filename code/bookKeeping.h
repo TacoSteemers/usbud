@@ -18,4 +18,5 @@ void processDevice(char* deviceId);
 int  checkIfDeviceIsKnown(char* deviceId);
 void registerDevice(char* deviceId);
 void backDeviceUp(char* deviceId);
+
 #endif
