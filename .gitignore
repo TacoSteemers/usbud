@@ -1,3 +1,5 @@
+/.gitignore~
+/test
 /bin/uslist
 /code/uslist.c~
 /code/uslist.h~
