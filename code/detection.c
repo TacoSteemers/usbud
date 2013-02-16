@@ -35,6 +35,7 @@ void doCheck(void)
         	continue; //sda, sdb, sdc, ...
         processItem(dp->d_name);
     } while (dp != NULL);
+	free(dirp);
 
 	finalizeRun();
 }
