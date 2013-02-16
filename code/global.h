@@ -4,4 +4,8 @@
 extern const char *gTargetDirectory; /* defined in processArguments.c */
 extern int gCurrentRunId; /* defined in daemon.c */
 
+const int gModeSetting;      /* Defined in either daemon.c or uslist.c */
+#define DAEMONMODE 1
+#define LISTMODE 2
+
 #endif

@@ -19,7 +19,9 @@
 #include "bookKeeping.h"
 #include "global.h"
 
-int gCurrentRunId = 0; /* declared in global.c */
+int gCurrentRunId = 0;      /* Declared in global.h */
+const int gModeSetting = DAEMONMODE; /* Declared in global.h */
+/* This program uses the 'daemon mode' of the code base. */
 
 int main(int argc, char *argv[]) {
     /* Our process ID and Session ID */

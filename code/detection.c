@@ -76,6 +76,13 @@ void processItem(char *strInputPath)
 	getDeviceInfo(strId, &intIdLen, strDevice);
 	if(intIdLen==0)
 		return;
+	
+	if(gModeSetting == LISTMODE)
+	{	/* In list mode, we are only interested in listing the device */
+		printf("%s\n", strId);
+		return;
+	}
+
 	if(checkIfItemMounted(strInputPath)==0)
 		return; /* Not mounted, not of interest */
 	processDevice(strId);
