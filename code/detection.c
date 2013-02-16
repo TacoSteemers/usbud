@@ -13,7 +13,8 @@
 #include "bookKeeping.h"
 #include "global.h"
 
-void doCheck(void) {
+void doCheck(void) 
+{
     DIR *dirp;
     struct dirent *dp;
     char* dir_to_check = "/sys/block/";
@@ -30,16 +31,15 @@ void doCheck(void) {
         if ((dp = readdir(dirp)) == NULL) 
         	continue;
 		if(dp->d_name[0]!='s' || dp->d_name[1]!='d')
-        	continue;
+        	continue; //sda, sdb, sdc, ...
         processItem(dp->d_name);
     } while (dp != NULL);
 
 	finalizeRun();
 }
 
-void processItem(char *strInputPath) {
-	//syslog(LOG_DEBUG, "looking at %s\n", str); 
-
+void processItem(char *strInputPath) 
+{
     ssize_t len; // Length of the path to the symbolic link
     int i;
     char buf[256], *p;
@@ -78,31 +78,24 @@ void processItem(char *strInputPath) {
 		return;
 	if(checkIfItemMounted(strInputPath)==0)
 		return; /* Not mounted, not of interest */
-	//device newDevice;
-	//newDevice.id = strId;
-	//processDevice(newDevice);
 	processDevice(strId);
 }
 
-void getDeviceInfo(char* out, int *pOutLen, const char device[]){
+void getDeviceInfo(char* out, int *pOutLen, const char device[])
+{
 	addDeviceInfo(out, pOutLen, device, "/manufacturer");
 	if (pOutLen > 0)
-	{
 		out[*pOutLen-1] = ' ';
-	} 
 	addDeviceInfo(out, pOutLen, device, "/product");
 	if (pOutLen > 0)
-	{
 		out[*pOutLen-1] = ' ';
-	} 
 	addDeviceInfo(out, pOutLen, device, "/serial");
 	if (pOutLen == 0)
-	{
 		strcpy(out, "");
-	} 
 }
 
-void addDeviceInfo(char *out, int *pOutLen, const char device[], const char property[]){
+void addDeviceInfo(char *out, int *pOutLen, const char device[], const char property[])
+{
 	char source[512];
 	char buf[512];
 
@@ -118,15 +111,15 @@ void addDeviceInfo(char *out, int *pOutLen, const char device[], const char prop
 	// if such info appears to be found
 	int f = open(source, 0);
     int len = read(f, buf, 512);
-	if (len <= 0) {
+	if (len <= 0)
         return;
-    }
 	*pOutLen += len;
 	buf[len-1] = 0;
 	strcat(out, (const char*) buf);
 }
 
-int checkIfItemMounted(char *item){
+int checkIfItemMounted(char *item)
+{
 	char outputBuffer[32];
 	char newItemId[32];
 	sprintf(newItemId, "/dev/%s", item);

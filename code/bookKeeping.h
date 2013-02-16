@@ -8,6 +8,9 @@ typedef struct
 	int runId;
 } device;
 
+#define MAXNUMDEVS 256
+device* devices[MAXNUMDEVS];
+
 void initializeDeviceBookKeeping(void);
 void initializeRun(void);
 void finalizeRun(void);
