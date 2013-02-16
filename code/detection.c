@@ -119,6 +119,8 @@ void addDeviceInfo(char *out, int *pOutLen, const char device[], const char prop
 	// Concatenating desired info to target,
 	// if such info appears to be found
 	int f = open(source, 0);
+	if (f == -1)
+        return;
     int len = read(f, buf, 512);
 	if (len <= 0)
         return;
