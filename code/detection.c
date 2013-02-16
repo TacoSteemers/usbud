@@ -9,6 +9,7 @@
 #include <stdlib.h> // Contains system(), among other
 #include <syslog.h>
 #include <fcntl.h> // File control options (contains open())
+#include <ctype.h> // isspace()
 #include "detection.h"
 #include "bookKeeping.h"
 #include "global.h"
@@ -75,10 +76,10 @@ void processItem(char *strInputPath)
 	int intIdLen = 0;
 	getDeviceInfo(strId, &intIdLen, strDevice);
 	if(intIdLen==0)
-		return;
+		return; /* Some kind of bogus device */
 	
 	if(gModeSetting == LISTMODE)
-	{	/* In list mode, we are only interested in listing the device */
+	{	/* In list mode, we are only interested in listing the devices */
 		printf("%s\n", strId);
 		return;
 	}
@@ -90,6 +91,7 @@ void processItem(char *strInputPath)
 
 void getDeviceInfo(char* out, int *pOutLen, const char device[])
 {
+	int i;
 	addDeviceInfo(out, pOutLen, device, "/manufacturer");
 	if (pOutLen > 0)
 		out[*pOutLen-1] = ' ';
@@ -97,8 +99,17 @@ void getDeviceInfo(char* out, int *pOutLen, const char device[])
 	if (pOutLen > 0)
 		out[*pOutLen-1] = ' ';
 	addDeviceInfo(out, pOutLen, device, "/serial");
-	if (pOutLen == 0)
-		strcpy(out, "");
+	if (pOutLen <= 0)
+		return;
+
+	// Remove trailing spaces
+	i = strlen(out);
+	for(; i > -1; i--)
+	{
+		if(!isspace(out[i]) && !isblank(out[i]) && !iscntrl(out[i]))
+			break;
+		out[i] = '\0';
+	}
 }
 
 void addDeviceInfo(char *out, int *pOutLen, const char device[], const char property[])
