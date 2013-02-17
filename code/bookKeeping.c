@@ -3,7 +3,7 @@
 #include <string.h>
 #include "bookKeeping.h"
 #include "global.h"
-#include "util.h"
+#include "backup.h"
 
 device* devices[MAXNUMDEVS];
 
@@ -62,14 +62,6 @@ void finalizeRun(void)
 	}
 }
 
-void processDevice(char* deviceId)
-{
-	if(checkIfDeviceIsKnown(deviceId)==1)
-		return; /* Already known, and thus backed up */
-	registerDevice(deviceId);
-	backDeviceUp(deviceId);
-}
-
 int checkIfDeviceIsKnown(char* deviceId)
 {
 	int i = 0;
@@ -87,7 +79,7 @@ int checkIfDeviceIsKnown(char* deviceId)
 	return 0;
 }
 
-void registerDevice(char* deviceId)
+void registerDevice(device *out, char* deviceId)
 {
 	int i = 0;
 	for(; i < MAXNUMDEVS; i++)
@@ -101,39 +93,8 @@ void registerDevice(char* deviceId)
 			devices[i]->id,
 			devices[i]->index, 
 			i);
+		out = devices[i];
 		return;
 	}
-	syslog(LOG_DEBUG, "Device \"%s\" could not be registered.", deviceId);
-}
-
-void backDeviceUp(char* deviceId)
-{
-	int blacklisted = 0;
-	int whitelisted = 0;
-	int needsWhitelisting = 0;
-    if(gBlacklist != NULL)
-	{
-		blacklisted = contains(gBlacklist, deviceId);
-	}
-    if(gWhitelist != NULL)
-	{
-		needsWhitelisting = 1;
-		whitelisted = contains(gWhitelist, deviceId);
-	}
-	if((blacklisted == 1) && (whitelisted == 1))
-	{
-		syslog(LOG_INFO, "Device \"%s\" has been blacklisted as well as whitelisted. It will not be backed up.", deviceId);
-		return;
-	}
-	if(blacklisted == 1)
-	{
-		syslog(LOG_INFO, "Device \"%s\" has been blacklisted. It will not be backed up.", deviceId);
-		return;
-	}
-	if(needsWhitelisting && !whitelisted)
-	{
-		syslog(LOG_INFO, "Device \"%s\" has not been whitelisted. It will not be backed up.", deviceId);
-		return;
-	}
-	syslog(LOG_DEBUG, "backDeviceUp \"%s\". Not yet implemented.", deviceId);
+	syslog(LOG_DEBUG, "Device \"%s\" could not be registered. Too many devices have been registered already.", deviceId);
 }

@@ -14,14 +14,14 @@ Instructions will be made available when the project has reached it's minimal fu
 Please note that re-inserting a device, even in a different slot, does not necessarily trigger a new backup. It will only trigger a new backup if the device has been removed longer than the time between each run (30 seconds by default) before being inserted again. Which slot it is inserted in does not matter.
 
 ## To be implemented:
-- The actual backing up
-- Enable better support for 'all-in-one' card readers
 - Configuration options for storage device size limits
 Low priotity:
 - Configuration options for target directory size limits
 - Add the following optional behavior when hitting target directory size limits (if  a target directory size limit is configured): remove the oldest backups until enough space is created. The idea behind this is that the oldest backups should already have been backed up by the system's actual backup system, outside of usbud's control.
 - Determining the difference between a 'thumb drive' and external storage hard disks
 - Configuration options for ignoring external storage hard disks or 'thumb drives'
+
+It is possible that one might encounter problems when using several 'all-in-one' card readers of the same model. If that is the case, then please file a bug report.
 
 ## Note on building
 When building the project with the attached Makefile, a warning should show, like the following:

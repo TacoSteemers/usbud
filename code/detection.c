@@ -2,16 +2,17 @@
 
 #include <dirent.h>
 #include <errno.h>
-#include <unistd.h>
+#include <unistd.h> /* read, readlink */
 #include <string.h>
 #include <stdio.h>
 #include <stdarg.h>
-#include <stdlib.h> // Contains system(), among other
+#include <stdlib.h> /* Contains system, exit and codes */
 #include <syslog.h>
-#include <fcntl.h> // File control options (contains open())
+#include <fcntl.h> /* File control options (contains open) */
 #include "detection.h"
-#include "bookKeeping.h"
 #include "global.h"
+#include "bookKeeping.h"
+#include "backup.h"
 #include "util.h"
 
 void doCheck(void) 
@@ -19,6 +20,7 @@ void doCheck(void)
     DIR *directory;
     struct dirent *entry;
     char* dirToCheck = "/sys/block/";
+	char devicePath[32];
 
 	initializeRun();
 
@@ -32,15 +34,23 @@ void doCheck(void)
         if ((entry = readdir(directory)) == NULL) 
         	continue;
 		if(entry->d_name[0]!='s' || entry->d_name[1]!='d')
-        	continue; /* sda, sdb, sdc, ... */
-        processItem(entry->d_name);
+        	continue; 
+		/* sda, sdb, sdc, ... */
+
+		/* We will now double check via /proc/mounts that the item exists */
+		sprintf(devicePath, "/dev/%s", entry->d_name);
+		if(checkIfItemMounted(devicePath)==0)
+			continue; /* Not mounted, not of interest */  
+
+        processItem(devicePath, entry->d_name);
     } while (entry != NULL);
 	free(directory);
+	free(entry);
 
 	finalizeRun();
 }
 
-void processItem(char *strInputPath) 
+void processItem(char *devicePath, char* entryName) 
 {
     ssize_t len; /* Length of the path to the symbolic link */
     char buf[256];
@@ -54,9 +64,10 @@ void processItem(char *strInputPath)
 	/* strId will contain the identifier for the device, that will be used by
 		this code base */
 	char strId[256];
+	char mountPoint[MAXIDLENGTH];
 
 	/* Construct the path to /sys/block/... */
-	snprintf(strLocation, sizeof strLocation, "/sys/block/%s", strInputPath);
+	snprintf(strLocation, sizeof strLocation, "/sys/block/%s", entryName);
     
 	/* Read symbolink link 'location' into buf, 
 	   returns the number of bytes it has placed in buf */
@@ -83,9 +94,12 @@ void processItem(char *strInputPath)
 		return;
 	}
 
-	if(checkIfItemMounted(strInputPath)==0)
-		return; /* Not mounted, not of interest */
-	processDevice(strId);
+	getMountPoint(mountPoint, devicePath);
+	if(strlen(mountPoint) == 0)
+		return ; /* Apparently the device has been dismounted by now */
+	
+	/* It appears we have a valid device */
+	processDevice(mountPoint, strId); /* Defined in backup.c */
 }
 
 void getDeviceInfo(char* out, int *pOutLen, const char device[])
@@ -187,28 +201,66 @@ void addDeviceInfo(char *out, int *pOutLen, const char device[], const char prop
 	*pOutLen = strlen(out) + 1;
 }
 
-int checkIfItemMounted(char *item)
+int checkIfItemMounted(char *devicePath)
 {
 	char outputBuffer[32];
-	char newItemId[32];
-	sprintf(newItemId, "/dev/%s", item);
-	
 	FILE *file = fopen ("/proc/mounts", "r");
 	if (!file)
 	{
-		syslog(LOG_ERR, "Could not open /proc/mounts");
+		syslog(LOG_ERR, "Exiting with failure: Could not open /proc/mounts");
 		exit(EXIT_FAILURE);
 	}
-
 	while(!feof(file)) {
 		if (fgets(outputBuffer,sizeof(outputBuffer),file)) {
 		    /* Check if this line starts with our item */
-			if(strncmp(outputBuffer, newItemId, strlen(newItemId)) != 0)
+			if(strncmp(outputBuffer, devicePath, strlen(devicePath)) != 0)
 				continue;
 			/* It does */
-			syslog(LOG_NOTICE, "%s has been mounted, according to /proc/mounts: %s", item, outputBuffer);
 			return 1;
 		}
 	}
 	return 0;
+}
+
+void getMountPoint(char *out, char *devicePath)
+{
+	char outputBuffer[1024];
+	char *p1; /* To point at the start of the mount point */
+	char *p2; /* To point at the end of the mount point */
+	FILE *file = fopen ("/proc/mounts", "r");
+	if (!file)
+	{
+		syslog(LOG_ERR, "Exiting with failure: Could not open /proc/mounts");
+		exit(EXIT_FAILURE);
+	}
+	out[0] = '\0'; /* Necessary for strcat */
+	while(!feof(file)) {
+		if (fgets(outputBuffer,sizeof(outputBuffer),file)) {
+		    /* Check if this line starts with our item */
+			if(strncmp(outputBuffer, devicePath, strlen(devicePath)) != 0)
+				continue;
+			/* It does */
+
+			p1 = strchr(outputBuffer, ' ');
+			if(!p1)
+			{
+				syslog(LOG_ERR, "Exiting with failure: getMountPoint received invalid device path \"%s\"", devicePath);
+				exit(EXIT_FAILURE);
+			}
+			p1++; 
+			/* p1 now points at the start of the mount point*/
+
+			p2 = strchr(p1, ' '); 
+			if(!p2)
+			{
+				syslog(LOG_ERR, "Exiting with failure: getMountPoint received invalid device path \"%s\"", devicePath);
+				exit(EXIT_FAILURE);
+			}
+			/* p2 now points at the end of the mount point*/
+			*p2 = 0;
+
+			/* Place only the mount point in the out parameter */
+			strcat(out, p1);
+		}
+	}
 }

@@ -14,9 +14,7 @@ device* devices[MAXNUMDEVS];
 void initializeDeviceBookKeeping(void);
 void initializeRun(void);
 void finalizeRun(void);
-void processDevice(char* deviceId);
 int  checkIfDeviceIsKnown(char* deviceId);
-void registerDevice(char* deviceId);
-void backDeviceUp(char* deviceId);
+void registerDevice(device *out, char* deviceId);
 
 #endif
