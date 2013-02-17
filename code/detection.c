@@ -183,6 +183,8 @@ void addDeviceInfo(char *out, int *pOutLen, const char device[], const char prop
 	*pOutLen += len;
 	buf[len-1] = 0;
 	strcat(out, (const char*) buf);
+	tidyStringUp(out);
+	*pOutLen = strlen(out) + 1;
 }
 
 int checkIfItemMounted(char *item)
