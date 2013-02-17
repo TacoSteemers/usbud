@@ -79,7 +79,7 @@ int checkIfDeviceIsKnown(char* deviceId)
 	return 0;
 }
 
-void registerDevice(device *out, char* deviceId)
+int registerDevice(char* deviceId)
 {
 	int i = 0;
 	for(; i < MAXNUMDEVS; i++)
@@ -93,8 +93,8 @@ void registerDevice(device *out, char* deviceId)
 			devices[i]->id,
 			devices[i]->index, 
 			i);
-		out = devices[i];
-		return;
+		return i;
 	}
 	syslog(LOG_DEBUG, "Device \"%s\" could not be registered. Too many devices have been registered already.", deviceId);
+	return -1;
 }

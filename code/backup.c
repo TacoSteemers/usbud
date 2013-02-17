@@ -9,11 +9,11 @@
 
 void processDevice(char* mountPoint, char* deviceId)
 {
-	device *deviceContainer;
+	int index;
 	if(checkIfDeviceIsKnown(deviceId)==1)
 		return; /* Already known, and thus backed up */
-	registerDevice(deviceContainer, deviceId);
-	if(!deviceContainer)
+	index = registerDevice(deviceId);
+	if(index == -1)
 		return; /* Failed to get the device registered */
 	backDeviceUp(mountPoint, deviceId);
 }

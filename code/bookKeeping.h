@@ -15,6 +15,6 @@ void initializeDeviceBookKeeping(void);
 void initializeRun(void);
 void finalizeRun(void);
 int  checkIfDeviceIsKnown(char* deviceId);
-void registerDevice(device *out, char* deviceId);
+int registerDevice(char* deviceId);
 
 #endif
