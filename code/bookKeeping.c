@@ -51,14 +51,9 @@ void finalizeRun(void)
 			continue; /* No data, no need to remove */
 		if(devices[i]->runId == gCurrentRunId)
 			continue; /* Recent data, no need to remove */
-		syslog(LOG_DEBUG, "Removing stale device \"%s\" with runId %d, at index %d (%d).", 
-			devices[i]->id, 
-			devices[i]->runId, 
-			devices[i]->index, 
-			i);
+		syslog(LOG_DEBUG, "Removing stale device \"%s\".", devices[i]->id);
 		devices[i]->id[0] = '\0';
 		devices[i]->runId = 0;
-		syslog(LOG_DEBUG, "Removed stale device.");
 	}
 }
 
@@ -69,11 +64,9 @@ int checkIfDeviceIsKnown(char* deviceId)
 	{
 		if(strncmp(devices[i]->id, deviceId, strlen(deviceId)) != 0)
 			continue; /* Not the same */
-		devices[i]->runId = gCurrentRunId;
-		syslog(LOG_DEBUG, "Device is already known (as \"%s\", at index %d (%d)). runId has been updated.", 
-			devices[i]->id, 
-			devices[i]->index, 
-			i);
+		/* This is the same. We will update the runId, 
+			to show that this device is not stale */
+		devices[i]->runId = gCurrentRunId; 
 		return 1;
 	}
 	return 0;
@@ -88,11 +81,7 @@ int registerDevice(char* deviceId)
 			continue; /* Not an empty spot */
 		memcpy(devices[i]->id, deviceId, strlen(deviceId)+1);
 		devices[i]->runId = gCurrentRunId;
-		syslog(LOG_DEBUG, "Device \"%s\" has been registered (as \"%s\", at index %d (%d)).", 
-			deviceId, 
-			devices[i]->id,
-			devices[i]->index, 
-			i);
+		syslog(LOG_DEBUG, "Device \"%s\" has been registered.", deviceId);
 		return i;
 	}
 	syslog(LOG_DEBUG, "Device \"%s\" could not be registered. Too many devices have been registered already.", deviceId);
