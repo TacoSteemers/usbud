@@ -16,26 +16,26 @@
 
 void doCheck(void) 
 {
-    DIR *dirp;
-    struct dirent *dp;
-    char* dir_to_check = "/sys/block/";
+    DIR *directory;
+    struct dirent *entry;
+    char* dirToCheck = "/sys/block/";
 
 	initializeRun();
 
-	if ((dirp = opendir(dir_to_check)) == NULL) 
+	if ((directory = opendir(dirToCheck)) == NULL) 
     {
-		syslog(LOG_ERR, "couldn't open '%s'",  dir_to_check);  
+		syslog(LOG_ERR, "couldn't open '%s'",  dirToCheck);  
         return;
     }
     do 
     {	/* Proccess each item in /sys/block/ */
-        if ((dp = readdir(dirp)) == NULL) 
+        if ((entry = readdir(directory)) == NULL) 
         	continue;
-		if(dp->d_name[0]!='s' || dp->d_name[1]!='d')
+		if(entry->d_name[0]!='s' || entry->d_name[1]!='d')
         	continue; /* sda, sdb, sdc, ... */
-        processItem(dp->d_name);
-    } while (dp != NULL);
-	free(dirp);
+        processItem(entry->d_name);
+    } while (entry != NULL);
+	free(directory);
 
 	finalizeRun();
 }
