@@ -48,8 +48,6 @@ void backDeviceUp(char* mountPoint, char* deviceId)
 		return;
 	}
 
-	syslog(LOG_INFO, "Device \"%s\" will be backed up.", deviceId);
-
 	/* Create target directory string */
 	char* target = malloc(strlen(gTargetDirectory) + strlen(deviceId) + 2);
 	if(!target)
@@ -75,25 +73,19 @@ void spawnBackup(char *source, char *target){
     /* The parent`s new pid will be 0 */
     if(pid != 0)
 	{	
-	    pid = fork();
-		if(pid != 0)
-		{	/* Create target directory */
-			char *args1[] = {"mkdir", target, (char *) 0};
-			execvp("mkdir", args1);
-			syslog(LOG_ERR, "Failed to create directory: %s \n", target);
-		}
-		else 
-		{	/* Do backup using rsync */
-			/* Escape target directory name with quotes 
-				(because of spaces) */
-			char* targetWithQuotes = malloc(strlen(target)+3);
-			targetWithQuotes[0] = '\"';
-			memcpy(targetWithQuotes+1, target, strlen(target)+1);
-			strcat(targetWithQuotes, "\"");
-			char *args2[] = {"rsync", "-Pr", source, targetWithQuotes, (char *) 0};
-			execvp("rsync", args2);	
-			syslog(LOG_ERR, "Failed to backup: %s->%s", source, targetWithQuotes);
-		}
+	    /* Do backup using rsync */
+		/* In regards to the spaces, I have tried numerous 
+			combinations of ', " and '\0', in all their 
+			escaped glory, to no avail.
+		   Even the usual trick for escaping both a local 
+			and a remote shell does not work.
+		   In the end I decided to just remove them. */
+		char* targetNoSpaces = replace(target, " ", "");
+		char *args2[] = {"rsync", "-Pr", source, targetNoSpaces, (char *) 0};
+		syslog(LOG_INFO, "Device will be backed up in \"%s\"", targetNoSpaces);
+		execvp("rsync", args2);	
+		syslog(LOG_ERR, "Failed to backup: %s->%s", source, targetNoSpaces);
+		free(targetNoSpaces);
 		exit(EXIT_SUCCESS);
 	}
 }
