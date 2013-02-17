@@ -43,8 +43,7 @@ void doCheck(void)
 void processItem(char *strInputPath) 
 {
     ssize_t len; /* Length of the path to the symbolic link */
-    int i;
-    char buf[256], *p;
+    char buf[256];
 	/* strLocation will contain the symbolic link in /sys/block/,
 		that leads to the device that we want to investigate */
     char strLocation[256];
@@ -68,23 +67,11 @@ void processItem(char *strInputPath)
 	    rather than the symbolic link */
     sprintf(strDevice, "%s/%s", "/sys/block/", buf);
 
-	/* strrchr: Locate last occurrence of character in string
-	            Returns a pointer to the last occurrence of 
-	 			character in the C string str.
-	   In effect, we drop everything after and including the 
-        sixth-from-the-back '/' character.
-	   We do this to get the proper device location (which 
-		USB connector our device is plugged in to)
-	   If we are looking at a SATA device instead, than this
-		is where things will start to look different than 
-		expected. */
-    for (i=0; i<6; i++) {
-        p = strrchr(strDevice, '/');
-        *p = 0;
-    }
-	
 	/* Now we try to gather device information 
-	   such as manufacturer, product and serial number */
+	    such as manufacturer, product and serial number.
+	   strDevice will be changed in the process. 
+	   We use a variable to make note of the length,
+		to be sure that we can properly zero-terminate. */
 	int intIdLen = 0;
 	getDeviceInfo(strId, &intIdLen, strDevice);
 	if(intIdLen==0)
@@ -103,6 +90,44 @@ void processItem(char *strInputPath)
 
 void getDeviceInfo(char* out, int *pOutLen, const char device[])
 {
+    int i;
+	char *p;
+	/* strModel will contain the identifier for the model of this device, 
+		as reported by the device. 
+      This is of interest in the case of multi-card readers. */
+	char strModel[256];
+	int intModelLen = 0;
+
+	/* strrchr: Locate last occurrence of character in string
+	            Returns a pointer to the last occurrence of 
+	 			character in the C string str.
+	   We will be using that function to deconstruct the device
+		variable into the parts that interest us.
+	   We do this to get the proper device location (which 
+		USB connector our device is plugged in to), and the
+		subsystem number. That number we use to get the device
+		model. 
+	   In the case of a simple thumb drive, the subsystem number 
+		will be 0. 
+	   A card reader with multiple slots will have multiple 
+		subsystems, each with it's own number.
+	   If we are looking at a SATA device instead of a USB device,
+		then this is where things will start to look different 
+		than expected. */
+
+	/* Retrieving subsystem (ends in subsystem id) */
+    for (i=0; i<2; i++) {
+        p = strrchr(device, '/');
+        *p = 0;
+    }
+	/* Retrieving model name from subsystem */
+	addDeviceInfo(strModel, &intModelLen, device, "/model");
+
+	/* Retrieving the general system information */
+    for (i=0; i<4; i++) {
+        p = strrchr(device, '/');
+        *p = 0;
+    }
 	addDeviceInfo(out, pOutLen, device, "/manufacturer");
 	if (pOutLen > 0)
 		out[*pOutLen-1] = ' ';
@@ -111,8 +136,25 @@ void getDeviceInfo(char* out, int *pOutLen, const char device[])
 		out[*pOutLen-1] = ' ';
 	addDeviceInfo(out, pOutLen, device, "/serial");
 	if (pOutLen <= 0)
-		return;
+		return; /* Apparently this is not a storage device 
+					that is compatible with this daemon.
+					An example of that is a SATA device. */
+
 	tidyStringUp(out);
+	tidyStringUp(strModel);
+
+	/* Process device model name, if any */
+	if(strlen(strModel) != 0)
+	{
+		if((strlen(strModel) + strlen(out) + 2) >= MAXIDLENGTH)
+		{
+			/* There is not enough space to add a space and 
+				the model to the id, so we create that space. */
+			out[MAXIDLENGTH - strlen(strModel) - 2] = 0;
+		}
+		strcat(out, " ");
+		strcat(out, strModel);
+	}
 }
 
 void addDeviceInfo(char *out, int *pOutLen, const char device[], const char property[])
