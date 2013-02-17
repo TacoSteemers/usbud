@@ -10,6 +10,8 @@ const int gModeSetting; /* Defined in either daemon.c or uslist.c */
 
 #define MAXLISTLENGTH 256
 #define MAXIDLENGTH 256
+#define MAXDEVICEPATHLENGTH 32
+#define MAXMOUNTPOINTLENGTH 1024
 char **gBlacklist; /* Defined in processArguments.c*/
 char **gWhitelist; /* Defined in processArguments.c*/
 #endif

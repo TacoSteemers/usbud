@@ -20,7 +20,7 @@ void doCheck(void)
     DIR *directory;
     struct dirent *entry;
     char* dirToCheck = "/sys/block/";
-	char devicePath[32];
+	char devicePath[MAXDEVICEPATHLENGTH];
 
 	initializeRun();
 
@@ -53,17 +53,17 @@ void doCheck(void)
 void processItem(char *devicePath, char* entryName) 
 {
     ssize_t len; /* Length of the path to the symbolic link */
-    char buf[256];
+    char buf[MAXIDLENGTH];
 	/* strLocation will contain the symbolic link in /sys/block/,
 		that leads to the device that we want to investigate */
-    char strLocation[256];
+    char strLocation[MAXIDLENGTH];
 	/* strDevice will contain the path to the actual device,
 		 (several versions of it, with varying detail)
 	    rather than the symbolic link */
-    char strDevice[256];
+    char strDevice[MAXIDLENGTH];
 	/* strId will contain the identifier for the device, that will be used by
 		this code base */
-	char strId[256];
+	char strId[MAXIDLENGTH];
 	char mountPoint[MAXIDLENGTH];
 
 	/* Construct the path to /sys/block/... */
@@ -71,7 +71,7 @@ void processItem(char *devicePath, char* entryName)
     
 	/* Read symbolink link 'location' into buf, 
 	   returns the number of bytes it has placed in buf */
-    len = readlink(strLocation, buf, 256);
+    len = readlink(strLocation, buf, MAXIDLENGTH);
     buf[len] = 0;
 
 	/* strDevice will contain the path to the actual device, 
@@ -109,7 +109,7 @@ void getDeviceInfo(char* out, int *pOutLen, const char device[])
 	/* strModel will contain the identifier for the model of this device, 
 		as reported by the device. 
       This is of interest in the case of multi-card readers. */
-	char strModel[256];
+	char strModel[MAXIDLENGTH];
 	int intModelLen = 0;
 
 	/* strrchr: Locate last occurrence of character in string
@@ -173,8 +173,8 @@ void getDeviceInfo(char* out, int *pOutLen, const char device[])
 
 void addDeviceInfo(char *out, int *pOutLen, const char device[], const char property[])
 {
-	char source[512];
-	char buf[512];
+	char source[MAXIDLENGTH];
+	char buf[MAXIDLENGTH];
 
 	/* Make sure that out has a null character to terminate it, 
 	    this is necessary when using strcat */
@@ -189,7 +189,7 @@ void addDeviceInfo(char *out, int *pOutLen, const char device[], const char prop
 	int f = open(source, 0);
 	if (f == -1)
         return;
-    int len = read(f, buf, 512);
+    int len = read(f, buf, MAXIDLENGTH);
 	if (len <= 0)
         return;
 
@@ -203,7 +203,7 @@ void addDeviceInfo(char *out, int *pOutLen, const char device[], const char prop
 
 int checkIfItemMounted(char *devicePath)
 {
-	char outputBuffer[32];
+	char outputBuffer[MAXDEVICEPATHLENGTH];
 	FILE *file = fopen ("/proc/mounts", "r");
 	if (!file)
 	{
@@ -224,7 +224,7 @@ int checkIfItemMounted(char *devicePath)
 
 void getMountPoint(char *out, char *devicePath)
 {
-	char outputBuffer[1024];
+	char outputBuffer[MAXMOUNTPOINTLENGTH];
 	char *p1; /* To point at the start of the mount point */
 	char *p2; /* To point at the end of the mount point */
 	FILE *file = fopen ("/proc/mounts", "r");
