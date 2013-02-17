@@ -30,12 +30,12 @@ int main(int argc, char *argv[]) {
     /* Fork off the parent process */
     pid = fork();
     if (pid < 0) {
-            exit(EXIT_FAILURE);
+        exit(EXIT_FAILURE);
     }
     /* If we got a good PID, then
        we can exit the parent process. */
     if (pid > 0) {
-            exit(EXIT_SUCCESS);
+        exit(EXIT_SUCCESS);
     }
 
     /* Change the file mode mask */
@@ -49,14 +49,14 @@ int main(int argc, char *argv[]) {
     /* Create a new SID for the child process */
     sid = setsid();
     if (sid < 0) {
-			syslog(LOG_ERR, "Program did not get proper sid");
-            exit(EXIT_FAILURE);
+		syslog(LOG_ERR, "Exiting with failure: Program did not get proper sid");
+        exit(EXIT_FAILURE);
     }
     
     /* Change the current working directory */
     if ((chdir("/")) < 0) {
-			syslog(LOG_ERR, "Program was unable to chdir");
-            exit(EXIT_FAILURE);
+		syslog(LOG_ERR, "Exiting with failure: Program was unable to chdir");
+        exit(EXIT_FAILURE);
     }
     
     /* Close out the standard file descriptors 
