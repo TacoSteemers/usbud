@@ -25,13 +25,12 @@ void initializeArgumentProcessing()
 
 void processArguments(const char * const *arr, int arrc)
 {
-    int i = 0;
+    int i = 1;
 	const char* argument;
-	syslog(LOG_DEBUG, "Entered the processArguments method."); 
 
 	if(arrc == 1)
 	{
-		syslog(LOG_DEBUG, "Leaving the processArguments method. There are no arguments to process.");
+		syslog(LOG_DEBUG, "There are no arguments to process.");
 		return;
 	}
 
@@ -62,8 +61,7 @@ void processArguments(const char * const *arr, int arrc)
 			default :
 				syslog(LOG_ERR, "Unknown command-line argument: %s", argument);
 		}
-	}
-	syslog(LOG_DEBUG, "Leaving the processArguments method."); 
+	} 
 }
 
 /* Translate a command-line argument to an int, for use in a switch function */
