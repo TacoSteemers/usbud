@@ -111,7 +111,6 @@ void backDeviceUp(char* deviceId)
 	int blacklisted = 0;
 	int whitelisted = 0;
 	int needsWhitelisting = 0;
-	int backUp = 1;
     if(gBlacklist != NULL)
 	{
 		blacklisted = contains(gBlacklist, deviceId);
