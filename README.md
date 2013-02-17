@@ -2,7 +2,7 @@ usbud
 =====
 
 ## USB Storage Back Up Daemon
-The daemon will back up usb storage devices the moment they are plugged in.
+The daemon will back up USB storage devices the moment they are plugged in.
 usbud is a work in progress, and not yet functional.
 The daemon supports blacklisting and whitelisting. Either list consists of a file that contains one device id on each line. One can use the 'uslist' executable to find the device ids.
 Log output can be found in syslog.
