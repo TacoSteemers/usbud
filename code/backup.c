@@ -61,6 +61,7 @@ void backDeviceUp(char* mountPoint, char* deviceId)
 	strcat(target, deviceId);
 
 	spawnBackup(mountPoint, target);  /* Defined in backup.c */
+	free(target);
 }
 
 void spawnBackup(char *source, char *target){
