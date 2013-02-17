@@ -28,11 +28,11 @@ void doCheck(void)
         return;
     }
     do 
-    {	// Proccess each item in /sys/block
+    {	/* Proccess each item in /sys/block/ */
         if ((dp = readdir(dirp)) == NULL) 
         	continue;
 		if(dp->d_name[0]!='s' || dp->d_name[1]!='d')
-        	continue; //sda, sdb, sdc, ...
+        	continue; /* sda, sdb, sdc, ... */
         processItem(dp->d_name);
     } while (dp != NULL);
 	free(dirp);
@@ -42,38 +42,49 @@ void doCheck(void)
 
 void processItem(char *strInputPath) 
 {
-    ssize_t len; // Length of the path to the symbolic link
+    ssize_t len; /* Length of the path to the symbolic link */
     int i;
     char buf[256], *p;
-    char strDevice[256];
+	/* strLocation will contain the symbolic link in /sys/block/,
+		that leads to the device that we want to investigate */
     char strLocation[256];
+	/* strDevice will contain the path to the actual device,
+		 (several versions of it, with varying detail)
+	    rather than the symbolic link */
+    char strDevice[256];
+	/* strId will contain the identifier for the device, that will be used by
+		this code base */
 	char strId[256];
 
-	// Construct the path to /sys/block/...
+	/* Construct the path to /sys/block/... */
 	snprintf(strLocation, sizeof strLocation, "/sys/block/%s", strInputPath);
     
-	// Read symbolink link 'location' into buf, 
-	// returns the number of bytes it has placed in buf
+	/* Read symbolink link 'location' into buf, 
+	   returns the number of bytes it has placed in buf */
     len = readlink(strLocation, buf, 256);
     buf[len] = 0;
 
-	// Format a string, into device
-	// device will contain the path to the actual device, 
-	// rather than the symbolic link
+	/* strDevice will contain the path to the actual device, 
+	    rather than the symbolic link */
     sprintf(strDevice, "%s/%s", "/sys/block/", buf);
 
-	// strrchr: Locate last occurrence of character in string
-	//          Returns a pointer to the last occurrence of 
-	//			character in the C string str.
-	// In effect, we drop everything after and including the sixth-from-the-back
-	// '/' character
-	// We do this to get the proper device location
+	/* strrchr: Locate last occurrence of character in string
+	            Returns a pointer to the last occurrence of 
+	 			character in the C string str.
+	   In effect, we drop everything after and including the 
+        sixth-from-the-back '/' character.
+	   We do this to get the proper device location (which 
+		USB connector our device is plugged in to)
+	   If we are looking at a SATA device instead, than this
+		is where things will start to look different than 
+		expected. */
     for (i=0; i<6; i++) {
         p = strrchr(strDevice, '/');
         *p = 0;
     }
 	
-	// Now we try to create a device id
+	/* Now we try to gather device information 
+	   such as manufacturer, product and serial number */
 	int intIdLen = 0;
 	getDeviceInfo(strId, &intIdLen, strDevice);
 	if(intIdLen==0)
@@ -109,22 +120,24 @@ void addDeviceInfo(char *out, int *pOutLen, const char device[], const char prop
 	char source[512];
 	char buf[512];
 
-	// Make sure that out has a null character to terminate it, 
-	// this is necessary when using strcat
+	/* Make sure that out has a null character to terminate it, 
+	    this is necessary when using strcat */
 	out[*pOutLen] = 0;
 
-	// Constructing source of desired info
+	/* Constructing source of desired info */
 	strcpy(source, device);
     strcat(source, property);
 
-	// Concatenating desired info to target,
-	// if such info appears to be found
+	/* Concatenating desired info to target,
+	   if such info appears to be found */
 	int f = open(source, 0);
 	if (f == -1)
         return;
     int len = read(f, buf, 512);
 	if (len <= 0)
         return;
+
+	/* Update the out variables */
 	*pOutLen += len;
 	buf[len-1] = 0;
 	strcat(out, (const char*) buf);
@@ -145,10 +158,10 @@ int checkIfItemMounted(char *item)
 
 	while(!feof(file)) {
 		if (fgets(outputBuffer,sizeof(outputBuffer),file)) {
-		    // Check if this line starts with our item
+		    /* Check if this line starts with our item */
 			if(strncmp(outputBuffer, newItemId, strlen(newItemId)) != 0)
 				continue;
-			// It does
+			/* It does */
 			syslog(LOG_NOTICE, "%s has been mounted, according to /proc/mounts: %s", item, outputBuffer);
 			return 1;
 		}
