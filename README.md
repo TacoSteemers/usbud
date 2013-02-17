@@ -4,13 +4,17 @@ usbud
 ## USB Storage Back Up Daemon
 The daemon will back up usb storage devices the moment they are plugged in.
 usbud is a work in progress, and not yet functional.
+The daemon supports blacklisting and whitelisting. Either lists consists of a file that contains one device id on each line. One can use the 'uslist' executable to find the device ids.
 Log output can be found in syslog.
 Project is known to work on GNU/Linux systems. usbud depends on the availability of items such as "/sys/block" and "/proc/mounts".
 
 ## To be implemented:
 - The actual backing up
+- Enable better support for 'all-in-one' card readers
 - Configuration options for storage device size limits
+Low priotity:
 - Configuration options for target directory size limits
+- Add the following optional behavior when hitting target directory size limits (if  a target directory size limit is configured): remove the oldest backups until enough space is created. The idea behind this is that the oldest backups should already have been backed up by the system's actual backup system, outside of usbud's control.
 - Determining the difference between a 'thumb drive' and external storage hard disks
 - Configuration options for ignoring external storage hard disks or 'thumb drives'
 
