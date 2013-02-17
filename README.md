@@ -8,6 +8,9 @@ The daemon supports blacklisting and whitelisting. Either list consists of a fil
 Log output can be found in syslog.
 This project is known to work on GNU/Linux systems. usbud depends on the availability of items such as "/sys/block" and "/proc/mounts".
 
+## Instructions on running the daemon
+Instructions will be made available when the project has reached it's minimal functionality requirements. Backing up the storage device contents is the last such requirement.
+
 ## To be implemented:
 - The actual backing up
 - Enable better support for 'all-in-one' card readers
