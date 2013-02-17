@@ -11,6 +11,8 @@ This project is known to work on GNU/Linux systems. usbud depends on the availab
 ## Instructions on running the daemon
 Instructions will be made available when the project has reached it's minimal functionality requirements. Backing up the storage device contents is the last such requirement.
 
+Please note that re-inserting a device, even in a different slot, does not necessarily trigger a new backup. It will only trigger a new backup if the device has been removed longer than the time between each run (30 seconds by default) before being inserted again. Which slot it is inserted in does not matter.
+
 ## To be implemented:
 - The actual backing up
 - Enable better support for 'all-in-one' card readers
