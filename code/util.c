@@ -1,3 +1,8 @@
+/* USB Storage Backup Daemon
+   Copyright 2012, Taco steemers. This program is distributed under the terms of
+   the GNU General Public License. A version of this license should have been 
+   provided. It can also be found on: http://www.gnu.org/licenses/gpl-3.0.txt */
+
 #include <stdlib.h> /* malloc and such */
 #include <ctype.h>  /* isspace */
 #include <string.h> /* strlen */
@@ -30,8 +35,13 @@ int contains(const char * const * list, const char* item)
 	return 0; /* No match */
 }
 
-/* Following substring replacement code is written by jmucchiello.
-   Taken from http://stackoverflow.com/questions/779875/what-is-the-function-to-replace-string-in-c 
+/* Following substring replacement code is written by jmucchiello ,and found 
+	here: http://stackoverflow.com/questions/779875/
+   As such, it's licensing is as follows: 
+	"user contributed content licensed under cc-wiki with attribution required"
+   This licence primarily concerns itself with attribution and sharing.
+
+   Author's note:
    You must free the result if result is non-NULL. */
 char *replace(char *orig, char *rep, char *with) {
     char *result; // the return string

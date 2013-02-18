@@ -1,9 +1,16 @@
-// USB storage backup
+/* USB Storage Backup Daemon
+   Copyright 2012, Taco steemers. This program is distributed under the terms of
+   the GNU General Public License. A version of this license should have been 
+   provided. It can also be found on: http://www.gnu.org/licenses/gpl-3.0.txt */
 
-// The general deamon code is adapted from
-// http://www.netzmafia.de/skripten/unix/linux-daemon-howto.html
-// Information on syslog can be found on
-// http://www.linuxselfhelp.com/gnu/glibc/html_chapter/libc_18.html
+/* The general deamon code is adapted from
+   http://www.netzmafia.de/skripten/unix/linux-daemon-howto.html
+   At the time of retrieval, the HOWTO itself used 'a BSD License', but one was 
+	offered. As such I took it to use the 'Simplified BSD License', a copy of 
+	which should have been provided with this program.
+
+   Information on syslog can be found on
+   http://www.linuxselfhelp.com/gnu/glibc/html_chapter/libc_18.html           */
 
 #include <sys/types.h>
 #include <sys/stat.h>
