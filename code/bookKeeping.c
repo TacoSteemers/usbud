@@ -56,7 +56,7 @@ void finalizeRun(void)
 			continue; /* No data, no need to remove */
 		if(devices[i]->runId == gCurrentRunId)
 			continue; /* Recent data, no need to remove */
-		syslog(LOG_DEBUG, "Removing stale device \"%s\".", devices[i]->id);
+		syslog(LOG_INFO, "Removing stale device \"%s\".", devices[i]->id);
 		devices[i]->id[0] = '\0';
 		devices[i]->runId = 0;
 	}
@@ -86,9 +86,9 @@ int registerDevice(char* deviceId)
 			continue; /* Not an empty spot */
 		memcpy(devices[i]->id, deviceId, strlen(deviceId)+1);
 		devices[i]->runId = gCurrentRunId;
-		syslog(LOG_DEBUG, "Device \"%s\" has been registered.", deviceId);
+		syslog(LOG_INFO, "Device \"%s\" has been registered.", deviceId);
 		return i;
 	}
-	syslog(LOG_DEBUG, "Device \"%s\" could not be registered. Too many devices have been registered already.", deviceId);
+	syslog(LOG_INFO, "Device \"%s\" could not be registered. Too many devices have been registered already.", deviceId);
 	return -1;
 }
