@@ -30,6 +30,8 @@ void tidyStringUp(char * string)
 	}
 }
 
+/* Expects the used slots to be at the start of the list, without gaps.
+   Also expects each unused item to start with a '\0' */
 int contains(const char * const * list, const char* item)
 {
 	int i = 0;
@@ -37,8 +39,7 @@ int contains(const char * const * list, const char* item)
 	{
 		if(list[i] == NULL || list[i][0] == '\0')
 			return 0; /* No match, reached end of list contents */
-		if( (strncmp(list[i], item, strlen(item)) == 0) && 
-			(strlen(list[i]) == strlen(item)))
+		if(strncmp(list[i], item, strlen(item)) == 0)
 			return 1; /* This is a match */
 	}
 	return 0; /* No match */
