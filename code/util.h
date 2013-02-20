@@ -8,6 +8,10 @@
 
 void tidyStringUp(char * string);
 int contains(const char * const * list, const char* item);
+FILE *openOrHang(const char *path, const char *mode);
+FILE *openOrDie (const char *path, const char *mode);
+FILE *keepTryingToOpen
+				(const char *path, const char *mode, int maxNumTries);
 char *replace(char *orig, char *rep, char *with);
 
 #endif

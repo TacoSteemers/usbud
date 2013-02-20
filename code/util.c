@@ -3,10 +3,19 @@
    the GNU General Public License. A version of this license should have been 
    provided. It can also be found on: http://www.gnu.org/licenses/gpl-3.0.txt */
 
-#include <stdlib.h> /* malloc and such */
+
+#include <stdlib.h> /* Contains system, exit and malloc and such */
+#include <stdio.h> /* fopen, feof, fgets, FILE */
 #include <ctype.h>  /* isspace */
 #include <string.h> /* strlen */
+#include <limits.h>
+#include <time.h>
+#include <fcntl.h> /* File control options (contains open) */
+#include <syslog.h>
+#include <unistd.h> /* sleep */
 #include "global.h" /* MAXLISTLENGTH */
+#include "util.h"
+
 
 /* Removes trailing spaces, blanks and control characters */
 void tidyStringUp(char * string)
@@ -33,6 +42,33 @@ int contains(const char * const * list, const char* item)
 			return 1; /* This is a match */
 	}
 	return 0; /* No match */
+}
+
+FILE *openOrHang(const char *path, const char *mode)
+{
+	return keepTryingToOpen(path, mode, 0);
+}
+
+FILE *openOrDie(const char *path, const char *mode)
+{
+	return keepTryingToOpen(path, mode, 1);
+}
+
+FILE *keepTryingToOpen(const char *path, const char *mode, int count)
+{
+	FILE *fp;
+	if(count < 1)
+		count = INT_MAX;
+	while(count--)
+	{
+		fp = fopen(path, mode);
+		if(fp)
+			return fp;
+		/* Path was unavailable. Let's try again in half a second. */
+		nanosleep((struct timespec[]){{0, 500000000}}, NULL);
+	}	
+	syslog(LOG_ERR, "Exiting with failure: Could not open \"%s\".", path);
+	exit(EXIT_FAILURE);
 }
 
 /* Following substring replacement code is written by jmucchiello ,and found 

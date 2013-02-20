@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <unistd.h>
+#include <unistd.h> /* sleep */
 #include <syslog.h>
 #include <string.h>
 #include "processArguments.h"

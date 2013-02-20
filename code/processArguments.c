@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <syslog.h>
 #include <string.h>
-#include <stdio.h> /* fopen, feof, fgets */
+#include <stdio.h> /* util.h uses FILE */
 #include "bookKeeping.h"
 #include "global.h"
 #include "processArguments.h"
@@ -115,20 +115,13 @@ void logArgumentReSetIgnored(const char* argument)
 
 /* Open a file, and copy each line into the memory behind one of the pointers in out */
 void loadListFromFile(char **out, const char * const *arr, int arrc, int indexOfArgument)
-{
+{	
 	if((indexOfArgument + 1) >= arrc)
 	{
 		syslog(LOG_ERR, "Exiting with failure. Command-line argument \"%s\" can not be set: it is missing it's parameter.", arr[indexOfArgument]);
         exit(EXIT_FAILURE);
 	}
-
-	FILE *file = fopen (arr[indexOfArgument + 1], "r");
-	if (!file)
-	{
-		syslog(LOG_ERR, "Exiting with failure. Could not open list argument \"%s\"", arr[indexOfArgument + 1]);
-		exit(EXIT_FAILURE);
-	}
-
+	FILE *file = openOrDie(arr[indexOfArgument + 1], "r"); /* util.c */
 	int count = 0;
 	char outputBuffer[MAXIDLENGTH];
 	while(!feof(file)) {

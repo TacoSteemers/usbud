@@ -10,7 +10,7 @@
 #include <errno.h>
 #include <unistd.h> /* read, readlink */
 #include <string.h>
-#include <stdio.h>
+#include <stdio.h> /* fopen, feof, fgets, FILE */
 #include <stdarg.h>
 #include <stdlib.h> /* Contains system, exit and codes */
 #include <syslog.h>
@@ -210,12 +210,7 @@ void addDeviceInfo(char *out, int *pOutLen, const char device[], const char prop
 int checkIfItemMounted(char *devicePath)
 {
 	char outputBuffer[MAXDEVICEPATHLENGTH];
-	FILE *file = fopen ("/proc/mounts", "r");
-	if (!file)
-	{
-		syslog(LOG_ERR, "Exiting with failure: Could not open /proc/mounts");
-		exit(EXIT_FAILURE);
-	}
+	FILE *file = openOrHang("/proc/mounts", "r"); /* util.c */
 	while(!feof(file)) {
 		if (fgets(outputBuffer,sizeof(outputBuffer),file)) {
 		    /* Check if this line starts with our item */
@@ -233,12 +228,7 @@ void getMountPoint(char *out, char *devicePath)
 	char outputBuffer[MAXMOUNTPOINTLENGTH];
 	char *p1; /* To point at the start of the mount point */
 	char *p2; /* To point at the end of the mount point */
-	FILE *file = fopen ("/proc/mounts", "r");
-	if (!file)
-	{
-		syslog(LOG_ERR, "Exiting with failure: Could not open /proc/mounts");
-		exit(EXIT_FAILURE);
-	}
+	FILE *file = openOrHang("/proc/mounts", "r"); /* util.c */
 	out[0] = '\0'; /* Necessary for strcat */
 	while(!feof(file)) {
 		if (fgets(outputBuffer,sizeof(outputBuffer),file)) {
