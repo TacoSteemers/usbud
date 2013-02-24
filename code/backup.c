@@ -80,7 +80,7 @@ void doBackup(char *source, char *target){
     char command[8192]; /* Max path length * 2 */
     char* targetNoSpaces = replace(target, " ", "");
     tidyStringUp(targetNoSpaces);
-    sprintf(command, "%s %s %s %s", "rsync", "-Pr", source, targetNoSpaces);
+    sprintf(command, "%s %s %s %s", "rsync", "-Prtu", source, targetNoSpaces);
     syslog(LOG_INFO, "Backup command: %s", command);
     FILE *outputPipe = popen (command, "r");
     if (!outputPipe)
