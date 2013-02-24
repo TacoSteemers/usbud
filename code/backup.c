@@ -8,6 +8,7 @@
 #include <unistd.h> /* getpid, fork, execv */
 #include <syslog.h>
 #include <string.h>
+#include <errno.h>
 #include "global.h"
 #include "util.h"
 #include "bookKeeping.h"
@@ -71,6 +72,9 @@ void backDeviceUp(char* mountPoint, char* deviceId)
 }
 
 void spawnBackup(char *source, char *target){
+    char errorBuf[32];
+    size_t errorBufLen = 32;
+    int error;
 	int pid;	
 	pid = getpid();
     
@@ -90,7 +94,12 @@ void spawnBackup(char *source, char *target){
 		char* targetNoSpaces = replace(target, " ", "");
 		char *args2[] = {"rsync", "-Pr", source, targetNoSpaces, (char *) 0};
 		syslog(LOG_INFO, "Device will be backed up in \"%s\"", targetNoSpaces);
-		execvp("rsync", args2);	
+		if(execvp("rsync", args2) == -1)
+        {
+            error = errno;
+            strerror_r(error, errorBuf, errorBufLen);
+            syslog(LOG_ERR, "Execution of backup failed: %s", errorBuf);
+        }
 		syslog(LOG_ERR, "Failed to backup: %s->%s", source, targetNoSpaces);
 		free(targetNoSpaces);
 		exit(EXIT_SUCCESS);
