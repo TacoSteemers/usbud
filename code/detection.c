@@ -28,11 +28,7 @@ void doCheck(void)
 
 	initializeRun();
 
-	if ((directory = opendir(dirToCheck)) == NULL) 
-    {
-		syslog(LOG_ERR, "couldn't open '%s'",  dirToCheck);  
-        return;
-    }
+	directory = openDirOrHang(dirToCheck);
     do 
     {	/* Proccess each item in /sys/block/ */
         if ((entry = readdir(directory)) == NULL) 

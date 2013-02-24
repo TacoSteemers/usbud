@@ -7,6 +7,7 @@
 #include <syslog.h>
 #include <string.h>
 #include <stdio.h> /* util.h uses FILE */
+#include <dirent.h> /* util.h uses DIR */
 #include "bookKeeping.h"
 #include "global.h"
 #include "processArguments.h"

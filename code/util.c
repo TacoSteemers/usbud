@@ -12,7 +12,8 @@
 #include <time.h>
 #include <fcntl.h> /* File control options (contains open) */
 #include <syslog.h>
-#include <unistd.h> /* sleep */
+#include <unistd.h> /* sleep, read, readlink */
+#include <dirent.h>
 #include "global.h" /* MAXLISTLENGTH */
 #include "util.h"
 
@@ -65,6 +66,27 @@ FILE *keepTryingToOpen(const char *path, const char *mode, int count)
 		fp = fopen(path, mode);
 		if(fp)
 			return fp;
+		/* Path was unavailable. Let's try again in half a second. */
+		nanosleep((struct timespec[]){{0, 500000000}}, NULL);
+	}	
+	syslog(LOG_ERR, "Exiting with failure: Could not open \"%s\".", path);
+	exit(EXIT_FAILURE);
+}
+
+DIR *openDirOrHang(const char *path)
+{
+	return keepTryingToOpenDir(path, 0);
+}
+
+DIR *keepTryingToOpenDir(const char *path, int count)
+{
+	DIR *directory;
+	if(count < 1)
+		count = INT_MAX;
+	while(count--)
+	{
+		if((directory = opendir(path)) != NULL)
+			return directory;
 		/* Path was unavailable. Let's try again in half a second. */
 		nanosleep((struct timespec[]){{0, 500000000}}, NULL);
 	}	

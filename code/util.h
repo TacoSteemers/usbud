@@ -12,6 +12,9 @@ FILE *openOrHang(const char *path, const char *mode);
 FILE *openOrDie (const char *path, const char *mode);
 FILE *keepTryingToOpen
 				(const char *path, const char *mode, int maxNumTries);
+DIR *openDirOrHang(const char *path);
+DIR *keepTryingToOpenDir
+				   (const char *path, int maxNumTries);
 char *replace(char *orig, char *rep, char *with);
 
 #endif
