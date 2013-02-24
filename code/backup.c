@@ -3,7 +3,7 @@
    the GNU General Public License. A version of this license should have been 
    provided. It can also be found on: http://www.gnu.org/licenses/gpl-3.0.txt */
 
-#include <stdlib.h> /* malloc and such */
+#include <stdlib.h> /* exit, malloc and such */
 #include <stdio.h> /* util.h uses FILE */
 #include <unistd.h> /* getpid, fork, execv */
 #include <syslog.h>

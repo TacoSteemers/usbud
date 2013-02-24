@@ -12,12 +12,8 @@
    Information on syslog can be found on
    http://www.linuxselfhelp.com/gnu/glibc/html_chapter/libc_18.html           */
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <errno.h>
+#include <sys/stat.h> /* umask */
+#include <stdlib.h> /* exit */
 #include <unistd.h> /* sleep */
 #include <syslog.h>
 #include <string.h>

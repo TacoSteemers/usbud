@@ -7,12 +7,10 @@
 	http://stackoverflow.com/questions/2432759/ */
 
 #include <dirent.h>
-#include <errno.h>
 #include <unistd.h> /* read, readlink */
 #include <string.h>
 #include <stdio.h> /* fopen, feof, fgets, FILE */
-#include <stdarg.h>
-#include <stdlib.h> /* Contains system, exit and codes */
+#include <stdlib.h> /* exit */
 #include <syslog.h>
 #include <fcntl.h> /* File control options (contains open) */
 #include "detection.h"
