@@ -31,7 +31,7 @@ void tidyStringUp(char * string)
 }
 
 /* Expects the used slots to be at the start of the list, without gaps.
-   Also expects each unused item to start with a '\0' */
+   Also expects each unused item to be null or start with a '\0' */
 int contains(const char * const * list, const char* item)
 {
 	int i = 0;
