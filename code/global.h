@@ -17,6 +17,13 @@ const int gModeSetting; /* Defined in either daemon.c or uslist.c */
 #define MAXIDLENGTH 256
 #define MAXDEVICEPATHLENGTH 32
 #define MAXMOUNTPOINTLENGTH 1024
+
+/* The daemon expects the used slots to be at the start of the list, 
+    without gaps.
+   Also expects each unused item to be null or start with a '\0'.
+   The daemon will not continue any comparisons after encountering
+    such an item. */
 char **gBlacklist; /* Defined in processArguments.c*/
 char **gWhitelist; /* Defined in processArguments.c*/
+
 #endif

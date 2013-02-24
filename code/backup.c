@@ -29,11 +29,11 @@ void backDeviceUp(char* mountPoint, char* deviceId)
 	int blacklisted = 0;
 	int whitelisted = 0;
 	int needsWhitelisting = 0;
-    if(gBlacklist != NULL)
+    if(gBlacklist[0] != NULL)
 	{
 		blacklisted = contains(gBlacklist, deviceId);
 	}
-    if(gWhitelist != NULL)
+    if(gWhitelist[0] != NULL)
 	{
 		needsWhitelisting = 1;
 		whitelisted = contains(gWhitelist, deviceId);
