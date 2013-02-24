@@ -68,41 +68,40 @@ void backDeviceUp(char* mountPoint, char* deviceId)
 	strcat(target, "/");
 	strcat(target, deviceId);
 
-	spawnBackup(mountPoint, target);  /* Defined in backup.c */
+	doBackup(mountPoint, target);  /* Defined in backup.c */
 	free(target);
 }
 
-void spawnBackup(char *source, char *target){
+void doBackup(char *source, char *target){
     char errorBuf[32];
     size_t errorBufLen = 32;
     int error;
-	int pid;	
-	pid = getpid();
-    
-    /* Create copy of current process */
-    pid = fork();
-
-    /* The parent`s new pid will be 0 */
-    if(pid != 0)
-	{	
-	    /* Do backup using rsync */
-		/* In regards to the spaces, I have tried numerous 
-			combinations of ', " and '\0', in all their 
-			escaped glory, to no avail.
-		   Even the usual trick for escaping both a local 
-			and a remote shell does not work.
-		   In the end I decided to just remove them. */
-		char* targetNoSpaces = replace(target, " ", "");
-		char *args2[] = {"rsync", "-Pr", source, targetNoSpaces, (char *) 0};
-		syslog(LOG_INFO, "Device will be backed up in \"%s\"", targetNoSpaces);
-		if(execvp("rsync", args2) == -1)
-        {
-            error = errno;
-            strerror_r(error, errorBuf, errorBufLen);
-            syslog(LOG_ERR, "Execution of backup failed: %s", errorBuf);
-        }
-		syslog(LOG_ERR, "Failed to backup: %s->%s", source, targetNoSpaces);
-		free(targetNoSpaces);
-		exit(EXIT_SUCCESS);
-	}
+    char outputBuffer[32];
+    char command[8192]; /* Max path length * 2 */
+    char* targetNoSpaces = replace(target, " ", "");
+    tidyStringUp(targetNoSpaces);
+    sprintf(command, "%s %s %s %s", "rsync", "-Pr", source, targetNoSpaces);
+    syslog(LOG_INFO, "Backup command: %s", command);
+    FILE *outputPipe = popen (command, "r");
+    if (!outputPipe)
+    {
+        error = errno;
+        strerror_r(error, errorBuf, errorBufLen);
+        syslog(LOG_ERR, "Execution of backup failed: %s", errorBuf);
+        syslog(LOG_ERR, "Exiting with failure: could not run command: \"%s\"", command);
+        exit(EXIT_FAILURE);
+    }
+    while(!feof(outputPipe)) {
+        fgets(outputBuffer, sizeof(outputBuffer), outputPipe);
+        /* Logging of backup can be implemented here */
+    }
+    if (pclose(outputPipe) == -1)
+    {
+        error = errno;
+        strerror_r(error, errorBuf, errorBufLen);
+        syslog(LOG_ERR, "Error while closing the pipe to the backup failed: %s", errorBuf);
+    }
+    if(targetNoSpaces != NULL)
+        free(targetNoSpaces);
+    syslog(LOG_INFO, "Execution of backup done.");
 }
