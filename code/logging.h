@@ -7,8 +7,8 @@
    This allows the code that uses the syslog function to
     compile on a Windows platform. */
 
-#ifndef DEVICE_H
-#define DEVICE_H
+#ifndef LOGGINGWINDOWS_H
+#define LOGGINGWINDOWS_H
 
     #ifdef _WIN32
 
