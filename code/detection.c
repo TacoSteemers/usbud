@@ -11,8 +11,8 @@
 #include <string.h>
 #include <stdio.h> /* fopen, feof, fgets, FILE */
 #include <stdlib.h> /* exit */
-#include <syslog.h>
 #include <fcntl.h> /* File control options (contains open) */
+#include "logging.h"
 #include "detection.h"
 #include "global.h"
 #include "bookKeeping.h"

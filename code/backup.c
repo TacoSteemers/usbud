@@ -5,11 +5,11 @@
 
 #include <stdlib.h> /* exit, malloc and such */
 #include <unistd.h> /* getpid, fork, execv */
-#include <syslog.h>
 #include <string.h>
 #include <errno.h>
 #include <stdio.h> /* util.h uses FILE */
 #include <dirent.h> /* util.h uses DIR */
+#include "logging.h"
 #include "global.h"
 #include "util.h"
 #include "bookKeeping.h"

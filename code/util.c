@@ -11,9 +11,9 @@
 #include <limits.h>
 #include <time.h>
 #include <fcntl.h> /* File control options (contains open) */
-#include <syslog.h>
 #include <unistd.h> /* sleep, read, readlink */
 #include <dirent.h>
+#include "logging.h"
 #include "global.h" /* MAXLISTLENGTH */
 #include "util.h"
 

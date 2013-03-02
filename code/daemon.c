@@ -15,8 +15,8 @@
 #include <sys/stat.h> /* umask */
 #include <stdlib.h> /* exit */
 #include <unistd.h> /* sleep */
-#include <syslog.h>
 #include <string.h>
+#include "logging.h"
 #include "processArguments.h"
 #include "detection.h"
 #include "bookKeeping.h"

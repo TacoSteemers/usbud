@@ -4,8 +4,8 @@
    provided. It can also be found on: http://www.gnu.org/licenses/gpl-3.0.txt */
 
 #include <stdlib.h> /* exit, malloc */
-#include <syslog.h>
 #include <string.h>
+#include "logging.h"
 #include "bookKeeping.h"
 #include "global.h"
 #include "backup.h"
