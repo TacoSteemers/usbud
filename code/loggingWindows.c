@@ -21,7 +21,7 @@ void syslog(int requestedMode, char *formatting, ...)
         return;
     va_list args;
     va_start(args,formatting);
-    vprintf(formatting,args);
+    vfprintf(logFile, formatting,args);
     va_end(args);                     
 }
 
