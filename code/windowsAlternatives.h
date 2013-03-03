@@ -1,0 +1,2 @@
+
+char *getuid(void);

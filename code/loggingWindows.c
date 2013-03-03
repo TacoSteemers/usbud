@@ -4,6 +4,7 @@
    provided. It can also be found on: http://www.gnu.org/licenses/gpl-3.0.txt */
 
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
 #include "logging.h"
@@ -21,14 +22,14 @@ void syslog(int requestedMode, char *formatting, ...)
         return;
     va_list args;
     va_start(args,formatting);
-    vfprintf(logFile, formatting,args);
+    vfprintf(logFile, formatting, args);
     va_end(args);                     
 }
 
 int setlogmask(int newMode)
 {
     int oldMode = mode;
-    mode = newmode;
+    mode = newMode;
     return oldMode;
 }
 
@@ -39,7 +40,7 @@ int LOG_UPTO(int newMode)
 
 void openlog(char* identifier, int unused_0, int unused_1)
 {
-    char[] filePath = char[4096];
+    char filePath[4096];
     filePath[0] = '\0';
     strcat(filePath, getenv("TEMP"));
     strcat(filePath, "\\");
