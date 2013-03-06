@@ -214,6 +214,7 @@ int checkIfItemMounted(char *devicePath)
 			return 1;
 		}
 	}
+    fclose(file);
 	return 0;
 }
 
@@ -253,4 +254,5 @@ void getMountPoint(char *out, char *devicePath)
 			strcat(out, p1);
 		}
 	}
+    fclose(file);
 }
