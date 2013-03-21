@@ -59,14 +59,5 @@ Low priotity:
 - Determining the difference between a 'thumb drive' and external storage hard disks
 - Configuration options for ignoring external storage hard disks or 'thumb drives'
 
-## Note on building
-When building the project with the attached Makefile, a warning should show, like the following:
-
-    ../code/daemon.c: In function ‘main’:
-    ../code/daemon.c:21:2: warning: passing argument 1 of ‘processArguments’ from incompatible pointer type [enabled by default]
-    ../code/processArguments.h:1:6: note: expected ‘const char * const*’ but argument is of type ‘char **’
-
-This is not a problem in this case. If you want to know why, you can read about it [here, on StackOverflow](http://stackoverflow.com/questions/12992407/warning-when-passing-non-const-parameter-to-a-function-that-expects-const-parame).
-
 ## License
 This program is distributed under the terms of the GNU General Public License. A version of this license should have been provided with the program. It can also be found on: [http://www.gnu.org/licenses/gpl-3.0.txt](http://www.gnu.org/licenses/gpl-3.0.txt)

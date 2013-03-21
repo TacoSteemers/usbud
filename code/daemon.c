@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
     
     /* Initialization of the daemon functionality */
 	initializeDeviceBookKeeping();
-   	processArguments(argv, argc);
+   	processArguments((const char * const *)argv, argc);
 	if(gTargetDirectory == NULL)
 	{
 		syslog(LOG_ERR, "Exiting with failure: No target directory has been specified. Specifying a target directory is mandatory.");
