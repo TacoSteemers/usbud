@@ -8,6 +8,7 @@
 
 const char *gTargetDirectory; /* defined in processArguments.c */
 int gCurrentRunId; /* defined in daemon.c */
+int gPrintDetailsInListMode; /* defined in uslist.c */
 
 const int gModeSetting; /* Defined in either daemon.c or uslist.c */
 #define DAEMONMODE 1

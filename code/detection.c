@@ -87,16 +87,23 @@ void processItem(char *devicePath, char* entryName)
 	getDeviceInfo(strId, &intIdLen, strDevice);
 	if(intIdLen==0)
 		return; /* Some kind of bogus device */
-	
-	if(gModeSetting == LISTMODE)
-	{	/* In list mode, we are only interested in listing the devices */
-		printf("%s\n", strId);
-		return;
-	}
 
 	getMountPoint(mountPoint, devicePath);
 	if(strlen(mountPoint) == 0)
 		return ; /* Apparently the device has been dismounted by now */
+	
+	if(gModeSetting == LISTMODE)
+	{	/* In list mode, we are only interested in listing the devices */
+        if(gPrintDetailsInListMode == 1)
+        {
+            printf("%s, %s, %s\n", devicePath, mountPoint, strId);            
+        }
+        else
+        {
+            printf("%s\n", strId);            
+        }
+		return;
+	}
 	
 	/* It appears we have a valid device */
 	processDevice(mountPoint, strId); /* Defined in backup.c */
