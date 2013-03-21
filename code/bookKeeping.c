@@ -5,7 +5,7 @@
 
 #include <stdlib.h> /* exit, malloc */
 #include <string.h>
-#include "logging.h"
+#include <syslog.h>
 #include "bookKeeping.h"
 #include "global.h"
 #include "backup.h"

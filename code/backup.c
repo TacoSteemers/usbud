@@ -9,7 +9,7 @@
 #include <errno.h>
 #include <stdio.h> /* util.h uses FILE */
 #include <dirent.h> /* util.h uses DIR */
-#include "logging.h"
+#include <syslog.h>
 #include "global.h"
 #include "util.h"
 #include "bookKeeping.h"
