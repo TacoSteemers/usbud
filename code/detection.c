@@ -39,7 +39,7 @@ void doCheck(void)
         if ((entry = readdir(directory)) == NULL) 
             continue;
         if(entry->d_name[0]!='s' || entry->d_name[1]!='d')
-            continue; 
+            continue;
         /* sda, sdb, sdc, ... */
 
         sprintf(devicePath, "/dev/%s", entry->d_name);
