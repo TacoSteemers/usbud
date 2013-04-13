@@ -15,7 +15,7 @@
 #include "bookKeeping.h"
 #include "backup.h"
 
-void processDevice(char* mountPoint, char* deviceId)
+void perhapsPerformBackup(char* mountPoint, char* deviceId)
 {
     int index;
     if(checkIfDeviceIsKnown(deviceId)==1)

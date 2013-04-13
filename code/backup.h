@@ -6,7 +6,7 @@
 #ifndef BACKUP_H
 #define BACKUP_H
 
-void processDevice(char *mountPoint, char *deviceId);
+void perhapsPerformBackup(char *mountPoint, char *deviceId);
 int needsBackup(char* deviceId);
 void createTargetDirectoryString(char* output, char* deviceId);
 void doBackup(char *source, char *target);

@@ -2,8 +2,8 @@ usbud
 =====
 
 ## USB Storage Back Up Daemon
-The daemon will back up USB storage devices the moment they are plugged in.
-The daemon supports blacklisting and whitelisting. Either list consists of a file that contains one device id on each line. One can use the 'uslist' executable to find the device ids.
+The daemon will back up all mounted partitions on USB storage devices.
+The daemon supports per-partition blacklisting and whitelisting. Either list consists of a file that contains one device id on each line. One can use the 'uslist' executable to find the device ids.
 Log output can be found in syslog.
 This project is known to work on GNU/Linux systems. usbud depends on the availability of items such as '/sys/block' and '/proc/mounts' and the application 'rsync'.
 **Important note: the USB storage back up daemon should not be confused with a 'full' backup solution. It should be used in conjunction with a 'full' backup solution.**
@@ -31,17 +31,18 @@ Please note that re-inserting a device, even in a different slot, does not neces
 
 Here are some examples of identifiers:
 
-	Generic MultiCard Device 00000000000006 USB  SD Reader
-	InphiCHN Mass Storage Device USB Flash Disk
-	Kingston DataTraveler 2.0 899000000000000000000073 DataTraveler 2.0
-	Kingston DataTraveler 2.0 899000000000000000000094 DataTraveler 2.0
-	Kingston DataTraveler 2.0 8998011620080115142551D9 DataTraveler 2.0
-	Generic Mass Storage 0ABE6A52 Flash Disk
-	Apple iPod 000A27001CB7AFED iPod
+	Generic MultiCard Device 00000000000006 USB  SD Reader1
+	InphiCHN Mass Storage Device USB Flash Disk1
+	Kingston DataTraveler 2.0 899000000000000000000073 DataTraveler 2.01
+	Kingston DataTraveler 2.0 899000000000000000000094 DataTraveler 2.01
+	Kingston DataTraveler 2.0 8998011620080115142551D9 DataTraveler 2.01
+	Generic Mass Storage 0ABE6A52 Flash Disk1
+    Generic Mass Storage 0ABE6A52 Flash Disk2
+	Apple iPod 000A27001CB7AFED iPod1
 
 The first is a card that has been inserted in an 'all-in-one' card reader. This  is supported. You may encounter problems when you use several card readers that were created by the same manufacturer. Maybe they would have to be of the same model, before problems occur.
 The second is a cheap thumb drive that does not carry any identifying meta data at all. If you plug in a second one that was made by the same manufacturer, the daemon system will become confused. Most likely it will remove the backup that it has for the first drive, and place the backup of the second drive in it's stead. 
-The next four items are regular thumb drives that will work quite well. 
+The next five items are regular thumb drives that will work quite well. One of them has two partitions on it.
 The last item is an iPod shuffle. Not every audio device is supported. To the best of my knowledge, all Creative Zen devices are not and are unlikely to ever be supported, because they use the 'MTP' protocol (Media Transfer Protocol). I have a Zen that I have tested this with. MTP is related to the Picture Transfer Protocol, and as such I'm quite certain that PTP devices are not supported either.
 
 ## Notes on device labels and multi-card readers

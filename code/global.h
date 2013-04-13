@@ -18,6 +18,7 @@ const int gModeSetting; /* Defined in either daemon.c or uslist.c */
 #define MAXIDLENGTH 256
 #define MAXDEVICEPATHLENGTH 32
 #define MAXMOUNTPOINTLENGTH 1024
+#define MAXNUMPARTITIONS 256 /* GPT primary partition limit * 2 */
 
 /* The daemon expects the used slots to be at the start of the list, 
     without gaps.

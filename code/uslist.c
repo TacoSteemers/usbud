@@ -21,13 +21,13 @@ int main(int argc, char *argv[])
             gPrintDetailsInListMode = 1;
     }
     
-	doCheck();
+    doCheck();
 
-	exit(EXIT_SUCCESS);
+    exit(EXIT_SUCCESS);
 }
 
 /* The following functions with empty body are here,
  because it allows us to use an unmodified 'detection.c' */
 void initializeRun() {}
 void finalizeRun() {}
-void processDevice(char* deviceId) {}
+void perhapsPerformBackup(char* deviceId) {}

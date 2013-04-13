@@ -25,6 +25,9 @@ void doCheck(void)
     struct dirent *entry;
     char* dirToCheck = "/sys/block/";
     char devicePath[MAXDEVICEPATHLENGTH];
+    char* partitions[MAXNUMPARTITIONS];
+    int count;
+    int *pCount = &count;
 
     initializeRun();
 
@@ -35,15 +38,19 @@ void doCheck(void)
             continue;
         if(entry->d_name[0]!='s' || entry->d_name[1]!='d')
             continue; 
-        /* sda, sdb, sdc, ... */
+        /* sda3, sdb1, sdc5, ... */
 
         /* We will now check via /proc/mounts 
             which partitions have been mounted */
         sprintf(devicePath, "/dev/%s", entry->d_name);
-        if(checkIfItemMounted(devicePath)==0)
-            continue; /* Not mounted, not of interest */  
-
-        processItem(devicePath, entry->d_name);
+        count = 0;
+        findMountedPartitions(partitions, pCount, devicePath);
+        int i;
+        for(i = 0; i < count; i++)
+        {
+            processPartition(devicePath, entry->d_name, partitions[i]);
+            free(partitions[i]);
+        }
     } while (entry != NULL);
     free(directory);
     free(entry);
@@ -51,34 +58,38 @@ void doCheck(void)
     finalizeRun();
 }
 
-void processItem(char *devicePath, char* entryName) 
+void processPartition(char *devicePath, 
+    char *deviceName, char *partition) 
 {
+    /* Examples of arguments:
+        processItem("/dev/sdh", "sdh", "/dev/sdh1");
+        processItem("/dev/sdh", "sdh", "/dev/sdh2");
+     */ 
+     
     ssize_t len; /* Length of the path to the symbolic link */
     char buf[MAXIDLENGTH];
     /* strLocation will contain the symbolic link in /sys/block/,
         that leads to the device that we want to investigate */
     char strLocation[MAXIDLENGTH];
-    /* strDevice will contain the path to the actual device,
-         (several versions of it, with varying detail)
-        rather than the symbolic link */
+    /* strDevice will contain the path to the device location in 
+        /sys/devices */
     char strDevice[MAXIDLENGTH];
-    /* strId will contain the identifier for the device, that will be used by
-        this code base */
+    /* strId will contain the identifier for the device, that will be 
+        used by this code base */
     char strId[MAXIDLENGTH];
-    char mountPoint[MAXIDLENGTH];
+    /* mountPoint will contain the path to which the partition
+        has been mounted */
+    char mountPoint[MAXMOUNTPOINTLENGTH];
+    getMountPoint(mountPoint, partition);
 
-    /* Construct the path to /sys/block/... */
-    snprintf(strLocation, sizeof strLocation, "/sys/block/%s", entryName);
-    
-    /* Read symbolink link 'location' into buf, 
-       returns the number of bytes it has placed in buf */
+    /* Next we get the relative path to the device location in 
+        /sys/devices, from the symbolic link in /sys/block */
+    snprintf(strLocation, sizeof strLocation, 
+        "/sys/block/%s", deviceName);    
     len = readlink(strLocation, buf, MAXIDLENGTH);
     buf[len] = 0;
-
-    /* strDevice will contain the path to the actual device, 
-        rather than the symbolic link */
     sprintf(strDevice, "%s/%s", "/sys/block/", buf);
-
+    
     /* Now we try to gather device information 
         such as manufacturer, product and serial number.
        strDevice will be changed in the process. 
@@ -86,15 +97,22 @@ void processItem(char *devicePath, char* entryName)
         to be sure that we can properly zero-terminate. */
     int intIdLen = 0;
     getDeviceInfo(strId, &intIdLen, strDevice);
-    if(intIdLen==0)
-        return; /* Some kind of bogus device */
-
-    getMountPoint(mountPoint, devicePath);
-    if(strlen(mountPoint) == 0)
-        return ; /* Apparently the device has been dismounted by now */
     
+    if(intIdLen==0)
+    {
+        /* Some kind of device that is not of interest
+           Most likely it doesn't have a 'serial' file, in which case
+            it isn't a normal USB storage device
+        */
+        return; 
+    }
+        
+    /* strId will end with the number of the partition */
+    strcat(strId, partition + strlen(devicePath));
+
     if(gModeSetting == LISTMODE)
-    {    /* In list mode, we are only interested in listing the devices */
+    {    /* In list mode, we are only interested in 
+             listing the devices */
         if(gPrintDetailsInListMode == 1)
         {
             printf("%s, %s, %s\n", devicePath, mountPoint, strId);            
@@ -106,8 +124,9 @@ void processItem(char *devicePath, char* entryName)
         return;
     }
     
-    /* It appears we have a valid device */
-    processDevice(mountPoint, strId); /* Defined in backup.c */
+    /* It appears we have a valid device, we should 
+        back it up if we are configured to do so */
+    perhapsPerformBackup(mountPoint, strId); /* Defined in backup.c */
 }
 
 void getDeviceInfo(char* out, int *pOutLen, const char device[])
@@ -209,17 +228,23 @@ void addDeviceInfo(char *out, int *pOutLen, const char device[], const char prop
     *pOutLen = strlen(out) + 1;
 }
 
-int checkIfItemMounted(char *devicePath)
+char* findMountedPartitions(char* output[], 
+    int* pCount, char *devicePath)
 {
-    char outputBuffer[MAXDEVICEPATHLENGTH];
+    char buf[MAXDEVICEPATHLENGTH];
     FILE *file = openOrHang("/proc/mounts", "r"); /* util.c */
     while(!feof(file)) {
-        if (fgets(outputBuffer,sizeof(outputBuffer),file)) {
+        if (fgets(buf,sizeof(buf),file)) {
             /* Check if this line starts with our item */
-            if(strncmp(outputBuffer, devicePath, strlen(devicePath)) != 0)
+            if(strncmp(buf, devicePath, strlen(devicePath)) != 0)
                 continue;
             /* It does */
-            return 1;
+            char* p = strchr(buf, ' ');
+            //p = p +1;
+            *p = 0;
+            output[*pCount] = malloc(MAXDEVICEPATHLENGTH);
+            memcpy(output[*pCount], buf, strlen(buf)+1);
+            *pCount = *pCount + 1;
         }
     }
     fclose(file);
@@ -228,38 +253,23 @@ int checkIfItemMounted(char *devicePath)
 
 void getMountPoint(char *out, char *devicePath)
 {
-    char outputBuffer[MAXMOUNTPOINTLENGTH];
+    char buf[MAXMOUNTPOINTLENGTH];
     char *p1; /* To point at the start of the mount point */
     char *p2; /* To point at the end of the mount point */
     FILE *file = openOrHang("/proc/mounts", "r"); /* util.c */
     out[0] = '\0'; /* Necessary for strcat */
     while(!feof(file)) {
-        if (fgets(outputBuffer,sizeof(outputBuffer),file)) {
+        if (fgets(buf,sizeof(buf),file)) {
             /* Check if this line starts with our item */
-            if(strncmp(outputBuffer, devicePath, strlen(devicePath)) != 0)
+            if(strncmp(buf, devicePath, strlen(devicePath)) != 0)
                 continue;
             /* It does */
-
-            p1 = strchr(outputBuffer, ' ');
-            if(!p1)
-            {
-                syslog(LOG_ERR, "Exiting with failure: getMountPoint received invalid device path \"%s\"", devicePath);
-                exit(EXIT_FAILURE);
-            }
-            p1++; 
-            /* p1 now points at the start of the mount point*/
-
-            p2 = strchr(p1, ' '); 
-            if(!p2)
-            {
-                syslog(LOG_ERR, "Exiting with failure: getMountPoint received invalid device path \"%s\"", devicePath);
-                exit(EXIT_FAILURE);
-            }
-            /* p2 now points at the end of the mount point*/
+            p1 = strchr(buf, ' '); 
+            p1 = p1 + 1;
+            p2 = strchr(p1, ' ');
             *p2 = 0;
-
-            /* Place only the mount point in the out parameter */
             strcat(out, p1);
+            break;
         }
     }
     fclose(file);
