@@ -5,7 +5,7 @@ usbud
 The daemon will back up all mounted partitions on USB storage devices.
 The daemon supports per-partition blacklisting and whitelisting. Either list consists of a file that contains one device id on each line. One can use the 'uslist' executable to find the device ids.
 Log output can be found in syslog.
-This project is known to work on GNU/Linux systems. usbud depends on the availability of items such as '/sys/block' and '/proc/mounts' and the application 'rsync'.
+This project is known to work on some GNU/Linux distributions. usbud depends on the availability of items such as '/sys/block' and '/proc/mounts' and the application 'rsync'.
 **Important note: the USB storage back up daemon should not be confused with a 'full' backup solution. It should be used in conjunction with a 'full' backup solution.**
 
 ## Instructions on running the daemon
