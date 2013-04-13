@@ -32,19 +32,19 @@ void doCheck(void)
     initializeRun();
 
     directory = openDirOrHang(dirToCheck);
+    /* Proccess each partition related to a device name in /sys/block/, 
+        that starts with "sd"*/
     do 
-    {    /* Proccess each item in /sys/block/ */
+    {
         if ((entry = readdir(directory)) == NULL) 
             continue;
         if(entry->d_name[0]!='s' || entry->d_name[1]!='d')
             continue; 
-        /* sda3, sdb1, sdc5, ... */
 
-        /* We will now check via /proc/mounts 
-            which partitions have been mounted */
         sprintf(devicePath, "/dev/%s", entry->d_name);
         count = 0;
         findMountedPartitions(partitions, pCount, devicePath);
+        
         int i;
         for(i = 0; i < count; i++)
         {
