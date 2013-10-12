@@ -60,7 +60,7 @@ To make sure that usbud doesn't confuse your cards with eachother, you can label
 A the moment of writing, it is not that easy under a GNU/Linux operating system. The documentation on the Ubuntu operating system (a GNU/Linux distribution) provides [details on this page](https://help.ubuntu.com/community/RenameUSBDrive).
 
 ## To be implemented:
-- Configuration options for storage device size limits
+- Configuration options for storage device size limits. Devices (or rather, partitions) above a certain size would not be backed up.
 
 Low priotity:
 - Remove dependency on rsync
