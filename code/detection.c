@@ -53,7 +53,8 @@ void doCheck(void)
             free(partitions[i]);
         }
     } while (entry != NULL);
-    free(directory);
+    closedir(directory);
+    /*free(directory);*/
     free(entry);
 
     finalizeRun();
