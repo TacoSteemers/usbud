@@ -31,8 +31,8 @@ void initializeArgumentProcessing()
 	signalTarget = "--target";
 	signalBlacklist = "--blacklist";
 	signalWhitelist = "--whitelist";
-	gBlacklist = malloc(MAXLISTLENGTH);
-	gWhitelist = malloc(MAXLISTLENGTH);
+	gBlacklist = calloc(MAXLISTLENGTH, MAXIDLENGTH);
+	gWhitelist = calloc(MAXLISTLENGTH, MAXIDLENGTH);
     
     gNotificationSetting = NONOTIFICATIONS;
     signalNotificationSetting = "--notification";
