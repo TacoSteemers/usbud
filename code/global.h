@@ -14,6 +14,13 @@ const int gModeSetting; /* Defined in either daemon.c or uslist.c */
 #define DAEMONMODE 1
 #define LISTMODE 2
 
+/* Which type of notification should be used */
+/* Will be set while proccessing arguments */
+int gNotificationSetting; 
+#define NONOTIFICATIONS 0 /* 0 is default for gNotificationSetting */
+#define NOTIFYSENDMODE 1
+#define XMESSAGEMODE 2
+
 #define MAXLISTLENGTH 256
 #define MAXIDLENGTH 256
 #define MAXDEVICEPATHLENGTH 32

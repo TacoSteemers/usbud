@@ -22,6 +22,14 @@ The blacklist file might look like the following:
 These identifiers can be obtained via the uslist application:
 
 	$ ./uslist
+    
+If you wish to receive notifications on the desktop, you can use one of the following arguments:
+
+    --notification notify-send
+    --notification xmessage
+    
+It is recommended that you use notify-send, if available on your system, because it is integrated with modern distributions. 
+When using xmessage, the notification will be shown for three seconds. Any pending backups will start after their related xmessage notification is gone.
 
 You may want to have usbud be started on system startup. In that case, I refer you to your platform's documentation to see find the recommended way of doing so.
 
@@ -53,8 +61,9 @@ A the moment of writing, it is not that easy under a GNU/Linux operating system.
 
 ## To be implemented:
 - Configuration options for storage device size limits
+
 Low priotity:
-- Remove dependence on rsync
+- Remove dependency on rsync
 - Configuration options for target directory size limits
 - Add the following optional behavior when hitting target directory size limits (if  a target directory size limit is configured): remove the oldest backups until enough space is created. The idea behind this is that the oldest backups should already have been backed up by the system's actual backup system, outside of usbud's control.
 - Determining the difference between a 'thumb drive' and external storage hard disks

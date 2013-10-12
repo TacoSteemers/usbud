@@ -12,9 +12,15 @@ void setTarget(const char * const *arr, int arrc, int indexOfArgument);
 int getArgumentSwitchInt(const char* argument);
 void logArgumentReSetIgnored(const char* argument);
 void loadListFromFile(char **out, const char * const *arr, int arrc, int indexOfArgument);
+void setNotificationMode(const char * const *arr, int arrc, int indexOfArgument);
+void dieBecauseMissingArgument(const char * argument);
 
 const char* signalTarget; /* defined in processArguments.c */
 const char* signalBlacklist; /* defined in processArguments.c */
 const char* signalWhitelist; /* defined in processArguments.c */
 
+/* For determining which way the user wishes to be notified */
+const char* signalNotificationSetting; /* defined in processArguments.c */
+const char* signalNotifySend; /* defined in processArguments.c */
+const char* signalXMessage; /* defined in processArguments.c */
 #endif

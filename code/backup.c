@@ -93,10 +93,41 @@ void doBackup(char *source, char *target)
     size_t errorBufLen = 32;
     char outputBuffer[32];
     char command[8192]; /* Max path length * 2 */
+    char notifyBefore[1024]; 
+    char notifyAfter[1024]; 
     char* targetNoSpaces = replace(target, " ", "");
     tidyStringUp(targetNoSpaces);
-    sprintf(command, "%s %s %s %s", "rsync", "-Prtu", source, 
-        targetNoSpaces);
+    if(gNotificationSetting != NONOTIFICATIONS)
+    {
+        char notifyBaseBefore[512];
+        char notifyBaseAfter[512];
+        sprintf(notifyBaseBefore, "Starting backup of %s.", source);
+        sprintf(notifyBaseAfter, "Finished backup of %s.", source);
+        
+        if(gNotificationSetting == NOTIFYSENDMODE)
+        {
+            sprintf(notifyBefore, 
+                "notify-send -i stock_save-as \"USB Storage Backup\" \"%s\"", 
+                notifyBaseBefore);
+            sprintf(notifyAfter,  
+                "notify-send -i stock_save-as \"USB Storage Backup\" \"%s\"", 
+                notifyBaseAfter);
+        }
+        if(gNotificationSetting == XMESSAGEMODE)
+        {
+            sprintf(notifyBefore, "xmessage \"USB Storage Backup %s\" -timeout 3", 
+                notifyBaseBefore);
+            sprintf(notifyAfter,  "xmessage \"USB Storage Backup %s\" -timeout 3", 
+            notifyBaseAfter);
+        }        
+        sprintf(command, "%s; %s %s %s %s; %s", notifyBefore, 
+            "rsync", "-Prtu", source, targetNoSpaces, notifyAfter);
+    }
+    else
+    {
+        sprintf(command, "%s %s %s %s", "rsync", "-Prtu", source, 
+            targetNoSpaces);
+    }    
     syslog(LOG_INFO, "Backup command: %s", command);
     FILE *outputPipe = popen (command, "r");
     if (!outputPipe)
