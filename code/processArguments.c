@@ -157,6 +157,7 @@ void loadListFromFile(char **out, const char * const *arr, int arrc, int indexOf
 			count++;
 		}
 	}
+    fclose(file);
 	syslog(LOG_INFO, "Using list located at \"%s\".\n", arr[indexOfArgument + 1]); 
 }
 
