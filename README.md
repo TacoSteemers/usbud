@@ -4,6 +4,7 @@ usbud
 ## USB Storage Back Up Daemon
 The daemon will back up all mounted partitions on USB storage devices.
 This project is known to work on some GNU/Linux distributions. usbud depends on the availability of items such as '/sys/block' and '/proc/mounts', the application 'rsync'.
+
 **Important note: the USB storage back up daemon should not be confused with a 'full' backup solution. It should be used in conjunction with a 'full' backup solution.**
 
 ## Features
@@ -19,7 +20,7 @@ The daemon supports per-partition blacklisting and whitelisting. Either list con
 ## Instructions on running the daemon
 The daemon can be run with a command like the following:
 
-    ./usbstoragebackup --target /home/user/mobilestoragebackup --blacklist /home/user/mobilestoragebackup/blacklist.txt;
+    ./usbstoragebackup --target /home/user/backup --blacklist /home/user/backup/blacklist.txt;
 
 The blacklist file might look like the following:
 
@@ -27,7 +28,7 @@ The blacklist file might look like the following:
     Kingston DataTraveler 2.0 899000000000000000000073 DataTraveler 2.0
     InphiCHN Mass Storage Device USB Flash Disk
 
-These identifiers can be obtained via the uslist application:
+The listed items will not be backed up. These identifiers can be obtained via the uslist application:
 
 	$ ./uslist
     
