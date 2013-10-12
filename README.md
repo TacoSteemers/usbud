@@ -3,10 +3,18 @@ usbud
 
 ## USB Storage Back Up Daemon
 The daemon will back up all mounted partitions on USB storage devices.
-The daemon supports per-partition blacklisting and whitelisting. Either list consists of a file that contains one device id on each line. One can use the 'uslist' executable to find the device ids.
-Log output can be found in syslog.
-This project is known to work on some GNU/Linux distributions. usbud depends on the availability of items such as '/sys/block' and '/proc/mounts' and the application 'rsync'.
+This project is known to work on some GNU/Linux distributions. usbud depends on the availability of items such as '/sys/block' and '/proc/mounts', the application 'rsync'.
 **Important note: the USB storage back up daemon should not be confused with a 'full' backup solution. It should be used in conjunction with a 'full' backup solution.**
+
+## Features
+
+- Will create a full backup of your USB storage's mounted partitions
+- Will not backup data that has not changed
+- Supports cardreaders and SD cards
+- Supports black- and whitelisting
+- Can provide notifications 
+
+The daemon supports per-partition blacklisting and whitelisting. Either list consists of a file that contains one (custom) device id on each line. One can use the included 'uslist' executable to find the device ids.
 
 ## Instructions on running the daemon
 The daemon can be run with a command like the following:
@@ -31,10 +39,6 @@ If you wish to receive notifications on the desktop, you can use one of the foll
 It is recommended that you use notify-send, if available on your system, because it is integrated with modern distributions. 
 When using xmessage, the notification will be shown for three seconds. Any pending backups will start after their related xmessage notification is gone.
 
-You may want to have usbud be started on system startup. In that case, I refer you to your platform's documentation to see find the recommended way of doing so.
-
-Please note that re-inserting a device, even in a different slot, does not necessarily trigger a new backup. It will only trigger a new backup if the device has been removed longer than the time between each run (30 seconds by default) before being inserted again. Which slot it is inserted in does not matter.
-
 ## Notes on what is supported, and what isn't
 
 Here are some examples of identifiers:
@@ -58,6 +62,16 @@ If you have several cards that use the same slot in your multi-card reader, the 
 If this happens, it is because the cards themselves have the same label. The usbud daemon does not have access to the kind of identifying information that it can find on regular thumb drives. As such, it can only depend on the card labels.
 To make sure that usbud doesn't confuse your cards with eachother, you can label them. When using a Microsoft Windows or Apple operating system, this should be quite easy.
 A the moment of writing, it is not that easy under a GNU/Linux operating system. The documentation on the Ubuntu operating system (a GNU/Linux distribution) provides [details on this page](https://help.ubuntu.com/community/RenameUSBDrive).
+
+## Other details 
+
+You may want to have usbud be started on system startup. In that case, I refer you to your platform's documentation to find the recommended way of doing so. It is safe to kill the daemon while a backup is running - the backup will not be interrupted or corrupted and you will still receive notification after the daemon has ended.
+
+Backups will not be run in parallel. For most users, running multiple backups in parallel will not make sense because one would run in to write performance limits on the backup target directory or read limitations on USB hubs. As a result, it could take longer for both of the backups to finish than it would if they had been run sequentially.
+
+Please note that re-inserting a device, even in a different slot, does not necessarily trigger a new backup. It will only trigger a new backup if the device has been removed longer than the time between each run (30 seconds by default) before being inserted again. Which slot it is inserted in does not matter.
+
+Log output can be found in syslog.
 
 ## To be implemented:
 - Configuration options for storage device size limits. Devices (or rather, partitions) above a certain size would not be backed up.
