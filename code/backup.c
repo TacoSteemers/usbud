@@ -25,10 +25,16 @@ void perhapsPerformBackup(char* mountPoint, char* deviceId)
         return; /* Failed to get the device registered */
     if(!needsBackup(deviceId))
         return;
-    
     /* Device needs backing up! */
+
     char* target = 
         malloc(strlen(gTargetDirectory) + strlen(deviceId) + 2);
+    if(!target)
+    {
+        syslog(LOG_ERR, 
+            "Exiting with failure: malloc failed during backDeviceUp");
+        exit(EXIT_FAILURE);
+    }
     createTargetDirectoryString(target, deviceId);
     doBackup(mountPoint, target);
     free(target);
@@ -70,17 +76,12 @@ int needsBackup(char* deviceId)
             "It will not be backed up.");
         return 0;
     }
+    syslog(LOG_INFO, "Device \"%s\" will be backed up.", deviceId);
     return 1;
 }
 
 void createTargetDirectoryString(char* target, char* deviceId)
 {
-    if(!target)
-    {
-        syslog(LOG_ERR, 
-            "Exiting with failure: malloc failed during backDeviceUp");
-        exit(EXIT_FAILURE);
-    }
     memcpy(target, gTargetDirectory, strlen(gTargetDirectory)+1);
     target[strlen(gTargetDirectory)+1] = '\0';    
     strcat(target, "/");
