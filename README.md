@@ -1,6 +1,12 @@
 usbud
 =====
 
+Did you ever make space on your SD card, but forgot to copy your photos to your harddrive?
+
+Did you ever carry around your important documents an a USB stick, and one day the stick just died... taking your documents with it?
+
+The goal of this project is to make sure your portable files are automatically backed up when you attach your USB device to your computer.
+
 ## USB Storage Back Up Daemon
 The daemon will back up all mounted partitions on USB storage devices.
 This project is known to work on some GNU/Linux distributions. usbud depends on the availability of items such as '/sys/block' and '/proc/mounts', the application 'rsync'.
