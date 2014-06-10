@@ -69,22 +69,22 @@ void processArguments(int argc, char * const *argv)
         switch (caseIndex)
         {
             case 't':
-                syslog(LOG_DEBUG, "option -t with value `%s'", optarg);
+                syslog(LOG_DEBUG, "option --target with value `%s'", optarg);
                 setTarget(optarg);
                 break;
 
             case 'b':
-                syslog(LOG_DEBUG, "option -b with value `%s'", optarg);
+                syslog(LOG_DEBUG, "option --blacklist with value `%s'", optarg);
                 loadListFromFile(gBlacklist, optarg);
                 break;
 
             case 'w':
-                syslog(LOG_DEBUG, "option -w with value `%s'", optarg);
+                syslog(LOG_DEBUG, "option --whitelist with value `%s'", optarg);
                 loadListFromFile(gWhitelist, optarg);
                 break;
 
             case 'n':
-                syslog(LOG_DEBUG, "option -n with value `%s'", optarg);
+                syslog(LOG_DEBUG, "option --notification with value `%s'", optarg);
                 setNotificationMode(optarg);
                 break;
 
