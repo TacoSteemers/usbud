@@ -6,33 +6,42 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-const char *gTargetDirectory; /* defined in processArguments.c */
-int gCurrentRunId; /* defined in daemon.c */
-int gPrintDetailsInListMode; /* defined in uslist.c */
-
-const int gModeSetting; /* Defined in either daemon.c or uslist.c */
-#define DAEMONMODE 1
-#define LISTMODE 2
-
-/* Which type of notification should be used */
-/* Will be set while proccessing arguments */
-int gNotificationSetting; 
-#define NONOTIFICATIONS 0 /* 0 is default for gNotificationSetting */
-#define NOTIFYSENDMODE 1
-#define XMESSAGEMODE 2
-
+/* Constants used for finding partitions and parsing lists */
 #define MAXLISTLENGTH 256
 #define MAXIDLENGTH 256
 #define MAXDEVICEPATHLENGTH 32
 #define MAXMOUNTPOINTLENGTH 1024
 #define MAXNUMPARTITIONS 256 /* GPT primary partition limit * 2 */
 
-/* The daemon expects the used slots to be at the start of the list, 
+/* A command-line argument for the uslist program */
+int gPrintDetailsInListMode; /* defined in uslist.c */
+
+/* Where the backups will end up */
+const char *gTargetDirectory; /* defined in processArguments.c */
+
+/* For becoming a daemon */
+int gCurrentRunId; /* defined in daemon.c */
+
+/* The mode seting is used to determine whether we are using uslist or usbud
+   functionality. */
+const int gModeSetting; /* Defined in either daemon.c or uslist.c */
+#define DAEMONMODE 1
+#define LISTMODE 2
+
+/* The blacklist and the white list used by usbud. 
+   Each used slot contains a device identifier, as determined by uslist.
+   The daemon expects the used slots to be at the start of the list, 
     without gaps.
    Also expects each unused item to be null or start with a '\0'.
    The daemon will not continue any comparisons after encountering
     such an item. */
 char **gBlacklist; /* Defined in processArguments.c*/
 char **gWhitelist; /* Defined in processArguments.c*/
+
+/* Which type of notification should be used */
+int gNotificationSetting; 
+#define NONOTIFICATIONS 0 /* 0 is default for gNotificationSetting */
+#define NOTIFYSENDMODE 1
+#define XMESSAGEMODE 2
 
 #endif
