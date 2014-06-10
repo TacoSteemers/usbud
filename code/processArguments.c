@@ -8,6 +8,7 @@
 #include <stdio.h> /* util.h uses FILE */
 #include <dirent.h> /* util.h uses DIR */
 #include <syslog.h>
+#include <getopt.h>
 #include "bookKeeping.h"
 #include "global.h"
 #include "processArguments.h"
@@ -28,11 +29,11 @@ const char* signalXMessage; /* declared in processArguments.h */
 
 void initializeArgumentProcessing()
 {
-	signalTarget = "--target";
-	signalBlacklist = "--blacklist";
-	signalWhitelist = "--whitelist";
-	gBlacklist = calloc(MAXLISTLENGTH, MAXIDLENGTH);
-	gWhitelist = calloc(MAXLISTLENGTH, MAXIDLENGTH);
+    signalTarget = "--target";
+    signalBlacklist = "--blacklist";
+    signalWhitelist = "--whitelist";
+    gBlacklist = calloc(MAXLISTLENGTH, MAXIDLENGTH);
+    gWhitelist = calloc(MAXLISTLENGTH, MAXIDLENGTH);
     
     gNotificationSetting = NONOTIFICATIONS;
     signalNotificationSetting = "--notification";
@@ -40,157 +41,131 @@ void initializeArgumentProcessing()
     signalXMessage = "xmessage";
 }
 
-void processArguments(const char * const *arr, int arrc)
+void processArguments(int argc, char * const *argv)
 {
-    int i = 1;
-	const char* argument;
+    int caseIndex;
+    static struct option options[] =
+        {
+            {"target",       required_argument, 0, 't'},
+            {"blacklist",    required_argument, 0, 'b'},
+            {"whitelist",    required_argument, 0, 'w'},
+            {"notification", required_argument, 0, 'n'},
+            {0, 0, 0, 0}
+        };
 
-	if(arrc == 1)
-	{
-		syslog(LOG_DEBUG, "There are no arguments to process.");
-		return;
-	}
+    initializeArgumentProcessing();
+    
+    while (1)
+    {
+        /* getopt_long stores the option index here. */
+        int optIndex = 0;
 
-	initializeArgumentProcessing();
+        caseIndex = getopt_long (argc, argv, "t:b:w:n:", options, &optIndex);
 
-    for(; i < arrc; i++)
-	{
-		argument = arr[i];
-		switch( getArgumentSwitchInt(argument) ) 
-		{
-			case 0:
-				setTarget(arr, arrc, i);
-				i = i + 1; /* skip past argument parameter */
-				break;
-			case 1:
-				loadListFromFile(gBlacklist, arr, arrc, i);
-				i = i + 1; /* skip past argument parameter */
-				break;
-			case 2:
-				loadListFromFile(gWhitelist, arr, arrc, i);
-				i = i + 1; /* skip past argument parameter */
-				break;
-			case 3:
-				setNotificationMode(arr, arrc, i);
-				i = i + 1; /* skip past argument parameter */
-				break;
-			case -1:
-				syslog(LOG_ERR, "Exiting with failure. A null argument was passed to getArgumentIndex.");
-		        exit(EXIT_FAILURE);
-				break;
-			case -2:
-			default :
-				syslog(LOG_ERR, "Unknown command-line argument: %s", argument);
-		}
-	} 
-}
+        /* Detect the end of the options. */
+        if (caseIndex == -1)
+            break;
 
-/* Translate a command-line argument to an int, for use in a switch function */
-int getArgumentSwitchInt(const char* argument) 
-{
-	if(argument == NULL)
-	{
-		return -1;		
-	}
-	if(strcmp(argument, signalTarget) == 0)
-	{	/* The target directory is being set */
-		return 0;
-	}
-	if(strcmp(argument, signalBlacklist) == 0)
-	{	/* The blacklist filepath is being set */
-		return 1;
-	}
-	if(strcmp(argument, signalWhitelist) == 0)
-	{	/* The whitelist filepath is being set */
-		return 2;
-	}
-	if(strcmp(argument, signalNotificationSetting) == 0)
-	{	/* The notification setting is being set */
-		return 3;
-	}
-	return -2;
+        switch (caseIndex)
+        {
+            case 't':
+                syslog(LOG_DEBUG, "option -t with value `%s'", optarg);
+                setTarget(optarg);
+                break;
+
+            case 'b':
+                syslog(LOG_DEBUG, "option -b with value `%s'", optarg);
+                loadListFromFile(gBlacklist, optarg);
+                break;
+
+            case 'w':
+                syslog(LOG_DEBUG, "option -w with value `%s'", optarg);
+                loadListFromFile(gWhitelist, optarg);
+                break;
+
+            case 'n':
+                syslog(LOG_DEBUG, "option -n with value `%s'", optarg);
+                setNotificationMode(optarg);
+                break;
+
+            case '?':
+                /* getopt_long already printed an error message. */
+                break;
+
+            default:
+                abort ();
+        }
+    }
 }
 
 /* The target directory is being set */
-void setTarget(const char * const *arr, int arrc, int indexOfArgument)
+void setTarget(char* optarg)
 {
-	if((indexOfArgument + 1) >= arrc)
-	{
-        dieBecauseMissingArgument(arr[indexOfArgument]);
-	}
     if(gTargetDirectory != NULL)
-	{
-		logArgumentReSetIgnored(signalTarget);
-		return;
-	}
-	gTargetDirectory = arr[indexOfArgument + 1];
-	syslog(LOG_INFO, "Target has been set to \"%s\".\n", gTargetDirectory);
-}
-
-void logArgumentReSetIgnored(const char* argument)
-{
-	syslog(LOG_NOTICE, "An attempt to set the command-line argument \"%s\" after it has already been set, has been ignored.", argument);
+    {
+        logArgumentReSetIgnored(signalTarget);
+        return;
+    }
+    gTargetDirectory = optarg;
+    syslog(LOG_INFO, "Target has been set to \"%s\".\n", optarg);
 }
 
 /* Open a file, and copy each line into the memory behind one of the pointers in out */
-void loadListFromFile(char **out, const char * const *arr, int arrc, int indexOfArgument)
-{	
-	if((indexOfArgument + 1) >= arrc)
-	{
-        dieBecauseMissingArgument(arr[indexOfArgument]);
-	}
+void loadListFromFile(char **out, char *optarg)
+{    
     
-	FILE *file = openOrDie(arr[indexOfArgument + 1], "r"); /* util.c */
-	int count = 0;
-	char outputBuffer[MAXIDLENGTH];
-	while(!feof(file)) {
-		if (fgets(outputBuffer, MAXIDLENGTH, file)) {
-			tidyStringUp(outputBuffer);
-			out[count] = malloc(MAXIDLENGTH);
-			if(!out[count])
-			{
-				syslog(LOG_ERR, "Exiting with failure: malloc failed while processing arguments");
-				exit(EXIT_FAILURE);
-			}
-			memcpy(out[count], outputBuffer, MAXIDLENGTH);
-			out[count][MAXIDLENGTH -1] = '\0';
-			count++;
-		}
-	}
+    FILE *file = openOrDie(optarg, "r"); /* util.c */
+    int count = 0;
+    char outputBuffer[MAXIDLENGTH];
+    while(!feof(file)) {
+        if (fgets(outputBuffer, MAXIDLENGTH, file)) {
+            tidyStringUp(outputBuffer);
+            out[count] = malloc(MAXIDLENGTH);
+            if(!out[count])
+            {
+                syslog(LOG_ERR, "Exiting with failure: malloc failed while processing arguments");
+                exit(EXIT_FAILURE);
+            }
+            memcpy(out[count], outputBuffer, MAXIDLENGTH);
+            out[count][MAXIDLENGTH -1] = '\0';
+            count++;
+        }
+    }
     fclose(file);
-	syslog(LOG_INFO, "Using list located at \"%s\".\n", arr[indexOfArgument + 1]); 
+    syslog(LOG_INFO, "Using list located at %s", optarg); 
 }
 
-void setNotificationMode(const char * const *arr, int arrc, int indexOfArgument)
+void setNotificationMode(char *optarg)
 {
-	syslog(LOG_DEBUG, "setNotificationMode %s.\n", arr[indexOfArgument + 1]); 
-	if((indexOfArgument + 1) >= arrc)
-	{
-        dieBecauseMissingArgument(arr[indexOfArgument]);
-	}
+    syslog(LOG_DEBUG, "setNotificationMode %s", optarg); 
+    
     if(gNotificationSetting != NONOTIFICATIONS)
     {
         logArgumentReSetIgnored(signalNotificationSetting);
         return;
     }
     
-	const char* argument = arr[indexOfArgument+1];
-    if(strcmp(argument, signalNotifySend) == 0)
+    if(strcmp(optarg, signalNotifySend) == 0)
     {
         gNotificationSetting = NOTIFYSENDMODE;
-        syslog(LOG_INFO, "Notifying user with notify-send."); 
+        syslog(LOG_INFO, "Notifying user with notify-send"); 
         return;
     }
-    if(strcmp(argument, signalXMessage) == 0)
+    if(strcmp(optarg, signalXMessage) == 0)
     {
         gNotificationSetting = XMESSAGEMODE;
-        syslog(LOG_INFO, "Notifying user with xmessage."); 
+        syslog(LOG_INFO, "Notifying user with xmessage"); 
         return;
     }
+    
+    syslog(LOG_INFO, 
+            "--notification argument is not a known argument: %s", optarg); 
 }
 
-void dieBecauseMissingArgument(const char * argument)
+/* There was more than one attempt to set a specific argument. 
+   The subsequent attempts should be ignored.
+   Log that a re-set has been ignored. */
+void logArgumentReSetIgnored(const char* argument)
 {
-    syslog(LOG_ERR, "Exiting with failure. Command-line argument \"%s\" can not be set: it is missing it's parameter.", argument);
-    exit(EXIT_FAILURE);
+    syslog(LOG_NOTICE, "There was an attempt to set the command-line argument \"%s\" more than once. The new value has been ignored.", argument);
 }
