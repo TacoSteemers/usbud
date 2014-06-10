@@ -27,9 +27,13 @@ const char* signalNotificationSetting; /* declared in processArguments.h */
 const char* signalNotifySend; /* declared in processArguments.h */
 const char* signalXMessage; /* declared in processArguments.h */
 
+const char* signalInterval; /* declared in processArguments.h */
+long gIntervalSetting; /* declared in global.h */
+
 void initializeArgumentProcessing()
 {
     signalTarget = "--target";
+    
     signalBlacklist = "--blacklist";
     signalWhitelist = "--whitelist";
     gBlacklist = calloc(MAXLISTLENGTH, MAXIDLENGTH);
@@ -39,6 +43,9 @@ void initializeArgumentProcessing()
     signalNotificationSetting = "--notification";
     signalNotifySend = "notify-send";
     signalXMessage = "xmessage";
+    
+    signalInterval = "--interval";
+    gIntervalSetting = INTERVAL;
 }
 
 void processArguments(int argc, char * const *argv)
@@ -50,6 +57,7 @@ void processArguments(int argc, char * const *argv)
             {"blacklist",    required_argument, 0, 'b'},
             {"whitelist",    required_argument, 0, 'w'},
             {"notification", required_argument, 0, 'n'},
+            {"interval",     required_argument, 0, 'i'},
             {0, 0, 0, 0}
         };
 
@@ -87,6 +95,11 @@ void processArguments(int argc, char * const *argv)
                 syslog(LOG_DEBUG, "option --notification with value `%s'", optarg);
                 setNotificationMode(optarg);
                 break;
+                
+            case 'i':
+                syslog(LOG_DEBUG, "option --interval with value `%s'", optarg);
+                setInterval(optarg);
+                break;
 
             case '?':
                 /* getopt_long already printed an error message. */
@@ -96,6 +109,23 @@ void processArguments(int argc, char * const *argv)
                 abort ();
         }
     }
+}
+
+void setInterval(char* optarg)
+{
+    char* charAfterLong;
+    long arg = strtol(&optarg[0], &charAfterLong, 0);
+    if( arg < 1 )
+    {
+        syslog(LOG_INFO, "--interval argument is invalid, using the default");            
+    }
+    if(gIntervalSetting != INTERVAL)
+    {
+        logArgumentReSetIgnored(signalInterval);
+        return;
+    }
+    gIntervalSetting = arg;
+    syslog(LOG_INFO, "Interval has been set to \"%ld\"", gIntervalSetting);    
 }
 
 /* The target directory is being set */

@@ -79,9 +79,9 @@ int main(int argc, char *argv[]) {
 
     /* The Big Loop */
     while (1) {
-	   doCheck();
-       
-       sleep(30); /* wait 30 seconds */
+        
+        doCheck();     
+        sleep(gIntervalSetting);
     }
 
    exit(EXIT_SUCCESS);

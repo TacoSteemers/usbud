@@ -44,4 +44,8 @@ int gNotificationSetting;
 #define NOTIFYSENDMODE 1
 #define XMESSAGEMODE 2
 
+/* The interval between each scan */
+long gIntervalSetting; /* defined in processArguments.c */
+#define INTERVAL 30
+
 #endif

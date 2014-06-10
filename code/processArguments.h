@@ -12,14 +12,17 @@ void logArgumentReSetIgnored(const char* argument);
 void setTarget(char* optarg);
 void loadListFromFile(char **out, char* optarg);
 void setNotificationMode(char* optarg);
+void setInterval(char* optarg);
 
+
+/* The signal variables below describe the long form of a CLI argument */
 const char* signalTarget; /* defined in processArguments.c */
 const char* signalBlacklist; /* defined in processArguments.c */
 const char* signalWhitelist; /* defined in processArguments.c */
-
-/* For determining which way the user wishes to be notified */
 const char* signalNotificationSetting; /* defined in processArguments.c */
 const char* signalNotifySend; /* defined in processArguments.c */
 const char* signalXMessage; /* defined in processArguments.c */
+const char* signalInterval; /* defined in processArguments.c */
+
 #endif
 
