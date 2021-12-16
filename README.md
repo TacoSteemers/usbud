@@ -15,14 +15,14 @@ This project is known to work on some GNU/Linux distributions. usbud depends on 
 
 ## Table of Contents:
 
-    *  [Features](#features)
-    *  [Instructions on building the service](#instructions-on-building-the-service)
-    *  [Instructions on running the service](#instructions-on-running-the-service)
-    *  [Notes on what is supported, and what isn't](#notes-on-what-is-supported-and-what-isnt)
-    *  [Notes on device labels and multicard readers](#notes-on-device-labels-and-multicard-readers)
-    *  [Other details](#other-details)
-    *  [To be implemented:](#to-be-implemented)
-    *  [License](#license)
+*  [Features](#features)
+*  [Instructions on building the service](#instructions-on-building-the-service)
+*  [Instructions on running the service](#instructions-on-running-the-service)
+*  [Notes on what is supported, and what isn't](#notes-on-what-is-supported-and-what-isnt)
+*  [Notes on device labels and multicard readers](#notes-on-device-labels-and-multicard-readers)
+*  [Other details](#other-details)
+*  [To be implemented:](#to-be-implemented)
+*  [License](#license)
 
 ## Features
 
