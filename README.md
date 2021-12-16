@@ -8,7 +8,7 @@ Did you ever carry around your important documents an a USB stick, and one day t
 The goal of this project is to make sure your portable files are automatically backed up when you attach your USB device to your computer.
 
 ## USB Storage Back Up Daemon
-The daemon will back up all mounted partitions on USB storage devices.
+The daemon (service) will back up all mounted partitions on USB storage devices.
 This project is known to work on some GNU/Linux distributions. usbud depends on the availability of items such as '/sys/block' and '/proc/mounts', the application 'rsync'.
 
 **Important note: the USB storage back up daemon should not be confused with a 'full' backup solution. It should be used in conjunction with a 'full' backup solution.**
@@ -22,6 +22,18 @@ This project is known to work on some GNU/Linux distributions. usbud depends on 
 - Can provide notifications 
 
 The daemon supports per-partition blacklisting and whitelisting. Either list consists of a file that contains one (custom) device id on each line. One can use the included 'uslist' executable to find the device ids.
+
+## Instructions on building the daemon
+This project should build succesfully with any C compiler.
+It uses make. The Makefile is located in ./tools/.
+The output can be found in ./bin
+
+	taco@computer:~/workspace/usbud$ cd tools
+	taco@computer:~/workspace/usbud/tools$ make
+	cc -Wall -g -O0 -o ../bin/usbstoragebackup ../code/detection.c ../code/daemon.c ../code/processArguments.c ../code/bookKeeping.c ../code/util.c ../code/backup.c
+	cc -Wall -g -O0 -o ../bin/uslist ../code/uslist.c ../code/detection.c ../code/util.c
+	taco@computer:~/workspace/usbud/tools$ ls ../bin
+	usbstoragebackup  uslist
 
 ## Instructions on running the daemon
 The daemon can be run with a command like the following:
