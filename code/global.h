@@ -9,7 +9,8 @@
 /* Constants used for finding partitions and parsing lists */
 #define MAXLISTLENGTH 256
 #define MAXIDLENGTH 256
-#define MAXDEVICEPATHLENGTH 32
+/* MAXDEVICEPATHLENGTH is 260 because of 255 plus 5 for /dev/ and 1 for the overhead. */
+#define MAXDEVICEPATHLENGTH 261
 #define MAXMOUNTPOINTLENGTH 1024
 #define MAXNUMPARTITIONS 256 /* GPT primary partition limit * 2 */
 
