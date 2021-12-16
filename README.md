@@ -7,11 +7,22 @@ Did you ever carry around your important documents an a USB stick, and one day t
 
 The goal of this project is to make sure your portable files are automatically backed up when you attach your USB device to your computer.
 
-## USB Storage Back Up Daemon
+usbud stands for USB Storage Back Up Daemon.
 The daemon will back up all mounted partitions on USB storage devices. Daemon is an older word for "background service".
 This project is known to work on some GNU/Linux distributions. usbud depends on the availability of items such as '/sys/block' and '/proc/mounts', the application 'rsync'.
 
 **Important note: the USB storage back up daemon should not be confused with a 'full' backup solution. It should be used in conjunction with a 'full' backup solution.**
+
+## Table of Contents:
+
+    *  [Features](#features)
+    *  [Instructions on building the service](#instructions-on-building-the-service)
+    *  [Instructions on running the service](#instructions-on-running-the-service)
+    *  [Notes on what is supported, and what isn't](#notes-on-what-is-supported-and-what-isnt)
+    *  [Notes on device labels and multicard readers](#notes-on-device-labels-and-multicard-readers)
+    *  [Other details](#other-details)
+    *  [To be implemented:](#to-be-implemented)
+    *  [License](#license)
 
 ## Features
 
@@ -104,3 +115,4 @@ Low priotity:
 
 ## License
 This program is distributed under the terms of the GNU General Public License. A version of this license should have been provided with the program. It can also be found on: [http://www.gnu.org/licenses/gpl-3.0.txt](http://www.gnu.org/licenses/gpl-3.0.txt)
+
