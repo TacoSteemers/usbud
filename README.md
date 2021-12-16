@@ -8,7 +8,7 @@ Did you ever carry around your important documents an a USB stick, and one day t
 The goal of this project is to make sure your portable files are automatically backed up when you attach your USB device to your computer.
 
 ## USB Storage Back Up Daemon
-The daemon will back up all mounted partitions on USB storage devices. Daemon is an older word for "background service).
+The daemon will back up all mounted partitions on USB storage devices. Daemon is an older word for "background service".
 This project is known to work on some GNU/Linux distributions. usbud depends on the availability of items such as '/sys/block' and '/proc/mounts', the application 'rsync'.
 
 **Important note: the USB storage back up daemon should not be confused with a 'full' backup solution. It should be used in conjunction with a 'full' backup solution.**
